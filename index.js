@@ -158,6 +158,14 @@ bot.on('message', async (msg) => {
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU')});
+            await User.update(
+                { firstName:  data.name }, // Новые значения для обновления
+                {
+                    where: {
+                        chat_id: chatId, // Условие: chat_id = chatId
+                    },
+                }
+            )
             await bot.sendMessage(chatId, finalMessage, { parse_mode: 'HTML' });
 
         } catch (error) {
