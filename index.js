@@ -1,8 +1,13 @@
 const TelegramBot = require('node-telegram-bot-api');
 const tokens = require('./tokens');
-const { WEB_APP_URL, tg_token } = tokens;
+// const { WEB_APP_URL, tg_token } = tokens;
 const bot = new TelegramBot(tg_token, { polling: true });
 const { appendData, getData, writeBookingData } = require('./googleSheets');
+
+// messages.js
+
+const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
+const WEB_APP_URL = 'https://a457-95-161-223-226.ngrok-free.app';
 
 // Импортируем сообщения
 const messages = require('./messages');
@@ -45,17 +50,15 @@ bot.on('message', async (msg) => {
             dt_in: new Date().toLocaleString('ru-RU'),
         };
         const values = [[data.chat_id, data.user_id, data.user_name, data.booking_date, data.time, data.hours, data.table, data.dt_in]];
-        await appendData(SPREADSHEET_ID, RANGE, values);
-        await writeBookingData(SPREADSHEET_ID, data.booking_date, data);
+        // await appendData(SPREADSHEET_ID, RANGE, values);
+        // await writeBookingData(SPREADSHEET_ID, data.booking_date, data);
     }
 
     if (text === '/get_data') {
-        // const SPREADSHEET_ID = '1msOtHIvJASkvDLo6-9mcTxC5nJL6z8cvxl1TkyCRxU0';
-        // const RANGE = 'Items!A1:E1';
 
         // Получаем данные из таблицы
-        const GET_DATA_RANGE = 'bookings!A2:G';
-        const data = await getData(SPREADSHEET_ID, GET_DATA_RANGE);
+        // const GET_DATA_RANGE = 'bookings!A2:G';
+        // const data = await getData(SPREADSHEET_ID, GET_DATA_RANGE);
         // Форматируем данные для отправки
         let message = 'Данные из таблицы:\n\n';
         data.forEach((row, index) => {
@@ -81,10 +84,6 @@ bot.on('message', async (msg) => {
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь в приложении.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
             await bot.sendMessage(chatId, finalMessage, { parse_mode: 'HTML' });
-
-            // Отправка данных в Google Sheets
-            // const values = [[data.name, data.date, data.time, data.table, data.hours]];
-            // await appendData(SPREADSHEET_ID, RANGE, values);
 
         } catch (error) {
             console.error(error);
