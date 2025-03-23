@@ -1,4 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
+const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
+const WEB_APP_URL = 'https://a457-95-161-223-226.ngrok-free.app';
 // const tokens = require('./tokens');
 // const { WEB_APP_URL, tg_token } = tokens;
 const bot = new TelegramBot(tg_token, { polling: true });
@@ -6,8 +8,7 @@ const bot = new TelegramBot(tg_token, { polling: true });
 
 // messages.js
 
-const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
-const WEB_APP_URL = 'https://a457-95-161-223-226.ngrok-free.app';
+
 
 // Импортируем сообщения
 const messages = require('./messages');
