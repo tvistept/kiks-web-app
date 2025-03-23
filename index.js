@@ -1,8 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
-const tokens = require('./tokens');
+// const tokens = require('./tokens');
 // const { WEB_APP_URL, tg_token } = tokens;
 const bot = new TelegramBot(tg_token, { polling: true });
-const { appendData, getData, writeBookingData } = require('./googleSheets');
+// const { appendData, getData, writeBookingData } = require('./googleSheets');
 
 // messages.js
 
