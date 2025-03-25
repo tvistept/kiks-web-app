@@ -35,7 +35,7 @@ app.use('/api', apiRouter); // все API-роуты будут начинать
 
 // Запускаем Express-сервер на другом порту (не 3000)
 const API_PORT = 5000; // Или любой свободный порт
-app.listen(API_PORT, () => {
+app.listen(API_PORT, '0.0.0.0',() => {
   console.log(`API сервер запущен на http://localhost:${API_PORT}`);
 });
 
