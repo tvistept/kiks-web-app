@@ -23,7 +23,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors({
-  origin: ['https://neon-croquembouche-c9efa2.netlify.app', 'http://localhost:3000'],
+  origin: ['https://neon-croquembouche-c9efa2.netlify.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
