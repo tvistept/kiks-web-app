@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+const apiRouter = require('./api');
 const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
 const WEB_APP_URL = 'https://neon-croquembouche-c9efa2.netlify.app/';
 const bot = new TelegramBot(tg_token, { polling: true });
@@ -17,6 +18,26 @@ const RANGE = 'bookings!A1:E1';
 // Получаем текущую дату с временем 00:00
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00:00.000
+
+const express = require('express');
+const cors = require('cors');
+const app = express();
+app.use(cors({
+  origin: ['https://neon-croquembouche-c9efa2.netlify.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+
+
+
+// ... после app.use(cors()) ...
+app.use(express.json()); // для парсинга JSON
+app.use('/api', apiRouter); // все API-роуты будут начинаться с /api
+
+// Запускаем Express-сервер на другом порту (не 3000)
+const API_PORT = 5000; // Или любой свободный порт
+app.listen(API_PORT, () => {
+  console.log(`API сервер запущен на http://localhost:${API_PORT}`);
+});
 
 async function testConnection() {
 try {
