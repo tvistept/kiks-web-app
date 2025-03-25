@@ -19,6 +19,19 @@ const RANGE = 'bookings!A1:E1';
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00:00.000
 
+const https = require('https');
+const fs = require('fs');
+
+
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
+https.createServer(options, app).listen(443, () => {
+  console.log('HTTPS server running on port 443');
+});
+
 const express = require('express');
 const cors = require('cors');
 const app = express();
