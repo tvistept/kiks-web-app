@@ -31,9 +31,14 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors({
-  origin: ['https://neon-croquembouche-c9efa2.netlify.app'],
+  origin: ['https://neon-croquembouche-c9efa2.netlify.app','https://kiks-app.ru'],
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
+const http = require('http');
+http.createServer((req, res) => {
+  res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+  res.end();
+}).listen(80);
 
 
 
