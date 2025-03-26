@@ -19,6 +19,14 @@ const RANGE = 'bookings!A1:E1';
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00:00.000
 
+const https = require('https');
+const fs = require('fs');
+// Добавьте после импортов
+const sslOptions = {
+    key: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/fullchain.pem')
+  };
+
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -35,12 +43,20 @@ app.use('/api', apiRouter); // все API-роуты будут начинать
 
 // Запускаем Express-сервер на другом порту (не 3000)
 const API_PORT = 5000; // Или любой свободный порт
-app.listen(
+// Замените app.listen на:
+https.createServer(sslOptions, app).listen(
     API_PORT, 
     '0.0.0.0',
     () => {
-  console.log(`API сервер запущен на http://localhost:${API_PORT}`);
-});
+      console.log(`HTTPS сервер запущен на https://kiks-app.ru:${API_PORT}`);
+    }
+  );
+// app.listen(
+//     API_PORT, 
+//     '0.0.0.0',
+//     () => {
+//   console.log(`API сервер запущен на http://localhost:${API_PORT}`);
+// });
 
 async function testConnection() {
 try {
