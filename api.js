@@ -7,7 +7,7 @@ const { User, Booking } = models;
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на начало дня (00:00:00)
 
-// Получить все брони
+// Получить все брони с текущей даты
 router.get('/bookings', async (req, res) => {
   try {
     const bookings = await Booking.findAll(
@@ -20,6 +20,16 @@ router.get('/bookings', async (req, res) => {
       } 
     );
     res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Получить пользователя
+router.get('/get-user:chatId', async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { chat_id: chatId } });
+    res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

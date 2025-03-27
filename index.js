@@ -40,9 +40,6 @@ http.createServer((req, res) => {
   res.end();
 }).listen(80);
 
-
-
-// ... после app.use(cors()) ...
 app.use(express.json()); // для парсинга JSON
 app.use('/api', apiRouter); // все API-роуты будут начинаться с /api
 
@@ -56,21 +53,15 @@ https.createServer(sslOptions, app).listen(
       console.log(`HTTPS сервер запущен на https://kiks-app.ru:${API_PORT}`);
     }
   );
-// app.listen(
-//     API_PORT, 
-//     '0.0.0.0',
-//     () => {
-//   console.log(`API сервер запущен на http://localhost:${API_PORT}`);
-// });
 
 async function testConnection() {
-try {
-    await sequelize.authenticate();
-    await sequelize.sync();
-    console.log('Connection has been established successfully.');
-} catch (error) {
-    console.error('Unable to connect to the database:', error);
-}
+    try {
+        await sequelize.authenticate();
+        await sequelize.sync();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
 }
 
 testConnection();
@@ -96,30 +87,13 @@ bot.on('message', async (msg) => {
             }
         });
     }
-
     if (text === '/rules') {
         await bot.sendMessage(chatId, rules_message);
     }
-
     if (text === '/about') {
         const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
         await bot.sendMessage(chatId, `${about_message}\n\nтвоё имя: ${userToReturn.firstName}\nтвой id: ${userToReturn.chat_id}`, { parse_mode: 'HTML' });
-        // Отправка данных в Google Sheets
-        const data = {
-            chat_id: chatId,
-            user_id: msg.chat.username,
-            user_name: "Иван Иванов",
-            booking_date: "2025-03-21",
-            time: "14:00",
-            hours: "2",
-            table: "5",
-            dt_in: new Date().toLocaleString('ru-RU'),
-        };
-        const values = [[data.chat_id, data.user_id, data.user_name, data.booking_date, data.time, data.hours, data.table, data.dt_in]];
-        // await appendData(SPREADSHEET_ID, RANGE, values);
-        // await writeBookingData(SPREADSHEET_ID, data.booking_date, data);
     }
-
     if (text === '/my_bookings') {
         // const userBookings = await Booking.findAll({ where: { chat_id: chatId } });
         const userBookings = await Booking.findAll({
@@ -155,45 +129,7 @@ bot.on('message', async (msg) => {
         });
         // Отправляем данные пользователю
         await bot.sendMessage(chatId, message);
-
-        // console.log(userBookings);
-        // const data = userBookings.map(booking => [booking.chat_id, booking.user_name, booking.booking_date, booking.time, booking.hours, booking.table, booking.dt_in]);
-        // console.log(data);
-        // let message = 'Твои брони:\n\n';
-        // data.forEach((row, index) => {
-        //     message += `Запись ${index + 1}:\n`;
-        //     message += `• Имя: ${row[2]}\n`;
-        //     message += `• Дата: ${row[3]}\n`;
-        //     message += `• Время: ${row[4]}\n`;
-        //     message += `• Стол: ${row[6]}\n`;
-        //     message += `• Часы: ${row[5]}\n\n`;
-        // });
-
-        
-        
     }
-
-    if (text === '/get_data') {
-
-        // Получаем данные из таблицы
-        // const GET_DATA_RANGE = 'bookings!A2:G';
-        // const data = await getData(SPREADSHEET_ID, GET_DATA_RANGE);
-        // Форматируем данные для отправки
-        let message = 'Данные из таблицы:\n\n';
-        data.forEach((row, index) => {
-            message += `Запись ${index + 1}:\n`;
-            message += `• Имя: ${row[2]}\n`;
-            message += `• Дата: ${row[3]}\n`;
-            message += `• Время: ${row[4]}\n`;
-            message += `• Стол: ${row[6]}\n`;
-            message += `• Часы: ${row[5]}\n\n`;
-        });
-
-        // Отправляем данные пользователю
-        await bot.sendMessage(chatId, message);
-        
-    }
-
     if (msg?.web_app_data?.data) {
         try {
             const data = JSON.parse(msg.web_app_data.data);
@@ -204,7 +140,7 @@ bot.on('message', async (msg) => {
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU')});
             await User.update(
-                { firstName:  data.name }, // Новые значения для обновления
+                { firstName:  data.name, phone: data.phone }, // Новые значения для обновления
                 {
                     where: {
                         chat_id: chatId, // Условие: chat_id = chatId
