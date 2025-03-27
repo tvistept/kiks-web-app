@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const apiRouter = require('./api');
 const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
-const WEB_APP_URL = 'https://neon-croquembouche-c9efa2.netlify.app/';
+const WEB_APP_URL = 'https://neon-croquembouche-c9efa2.netlify.app';
 const bot = new TelegramBot(tg_token, { polling: true });
 // const { appendData, getData, writeBookingData } = require('./googleSheets');
 const sequelize = require('./db');
@@ -81,7 +81,7 @@ bot.on('message', async (msg) => {
         await bot.sendMessage(chatId, `Салют, ${userName}!\n\n${greating_message}`, {
             reply_markup: {
                 keyboard: [
-                    [{ text: 'Прикинуть кий к носу', web_app: { url: WEB_APP_URL } }],
+                    [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
                 ],
                 "resize_keyboard": true
             }
