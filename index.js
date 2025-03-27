@@ -95,7 +95,6 @@ bot.on('message', async (msg) => {
         await bot.sendMessage(chatId, `${about_message}\n\nтвоё имя: ${userToReturn.firstName}\nтвой id: ${userToReturn.chat_id}`, { parse_mode: 'HTML' });
     }
     if (text === '/my_bookings') {
-        // const userBookings = await Booking.findAll({ where: { chat_id: chatId } });
         const userBookings = await Booking.findAll({
             where: {
               booking_date: {

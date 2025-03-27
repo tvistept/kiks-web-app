@@ -26,9 +26,9 @@ router.get('/bookings', async (req, res) => {
 });
 
 // Получить пользователя
-router.get('/get-user?chatId', async (req, res) => {
+router.get('/get-user', async (req, res) => {
   try {
-    const user = await User.findOne({ where: { chat_id: chatId } });
+    const user = await User.findOne({ where: { chat_id: 93753787 } });
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
