@@ -36,14 +36,13 @@ router.delete('/bookings/:id', async (req, res) => {
       where: { booking_id: bookingId }
     });
 
-    console.log(`Бронь ${bookingId} удалена пользователем ${userChatId}`);
-
     if (!booking) {
       return res.status(404).json({ error: 'Бронирование не найдено' });
     }
 
+    console.log(`пользователь из базы: ${booking.chat_id}, пользователь из запроса: ${userChatId}`);
     // 2. Проверяем, что пользователь удаляет свою бронь (или это админ)
-    if (booking.chat_id !== userChatId) {
+    if (booking.chat_id != userChatId) {
       return res.status(403).json({ error: 'Нельзя удалить чужое бронирование' });
     }
 
