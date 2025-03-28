@@ -25,15 +25,35 @@ router.get('/bookings', async (req, res) => {
   }
 });
 
-// // Получить пользователя
-// router.get('/get-user:chat_id', async (req, res) => {
-//   try {
-//     const user = await User.findOne({ where: { chat_id: chat_id } });
-//     res.json(user);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+// DELETE /api/bookings/:id - Удаление бронирования
+router.delete('/bookings/:id', async (req, res) => {
+  try {
+    const bookingId = req.params.id;
+    const userChatId = req.query.chat_id; // Предполагаем, что chat_id передаётся в запросе
+
+    // 1. Находим бронь в базе
+    const booking = await Booking.findOne({
+      where: { booking_id: bookingId }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ error: 'Бронирование не найдено' });
+    }
+
+    // 2. Проверяем, что пользователь удаляет свою бронь (или это админ)
+    if (booking.chat_id !== userChatId) {
+      return res.status(403).json({ error: 'Нельзя удалить чужое бронирование' });
+    }
+
+    // 3. Удаляем бронь
+    await booking.destroy();
+    console.log(`Бронь ${bookingId} удалена пользователем ${userChatId}`);
+
+    res.status(200).json({ message: 'Бронирование удалено' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 router.get('/get-user', async (req, res) => {
   try {
