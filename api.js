@@ -36,6 +36,8 @@ router.delete('/bookings/:id', async (req, res) => {
       where: { booking_id: bookingId }
     });
 
+    console.log(`Бронь ${bookingId} удалена пользователем ${userChatId}`);
+
     if (!booking) {
       return res.status(404).json({ error: 'Бронирование не найдено' });
     }
