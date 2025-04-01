@@ -91,8 +91,8 @@ bot.on('message', async (msg) => {
         await bot.sendMessage(chatId, rules_message);
     }
     if (text === '/about') {
-        const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
-        await bot.sendMessage(chatId, `${about_message}\n\nтвоё имя: ${userToReturn.firstName}\nтвой id: ${userToReturn.chat_id}`, { parse_mode: 'HTML' });
+        // const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
+        await bot.sendMessage(chatId, about_message, { parse_mode: 'HTML' });
     }
     if (text === '/my_bookings') {
         const userBookings = await Booking.findAll({
