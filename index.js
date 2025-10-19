@@ -74,11 +74,13 @@ bot.on('message', async (msg) => {
         const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
         if (!userToReturn?.chat_id) {
             await User.create({ chat_id: chatId, firstName: msg.chat.username });
-            userName = ''
+            userName = null
         } else {
             userName = userToReturn.firstName
         }
-        await bot.sendMessage(chatId, `Салют, ${userName}!\n\n${greating_message}`, {
+
+        let salutMessage = userName ? `Салют, ${userName}!\n\n` : `Салют!\n\n`
+        await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, {
             reply_markup: {
                 keyboard: [
                     [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
