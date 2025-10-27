@@ -68,6 +68,21 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
+// Инициализация клиента при старте приложения
+let sheetsClient;
+(async function init() {
+  sheetsClient = google.sheets({ 
+    version: 'v4', 
+    auth: await auth.getClient() 
+  });
+})();
+
+const dateFormat = new Intl.DateTimeFormat('ru-RU', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric'
+});
+
 function dateFromString(dateString) {
   const [day, month, year] = dateString.split('.').map(Number);
   const date = new Date(year, month - 1, day);
