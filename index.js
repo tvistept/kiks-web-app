@@ -419,7 +419,7 @@ bot.on('message', async (msg) => {
             //     tableNum = 8
             // }
 
-            await bookTable(formattedDate, data.time, tableNum, data.hours, data.name, clubId);
+            await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
 
         } catch (error) {
             console.error(error);
