@@ -94,7 +94,8 @@ bot.on('message', async (msg) => {
     }
     if (text === '/about') {
         // const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
-        await bot.sendMessage(chatId, about_message, { parse_mode: 'HTML' });
+        // await bot.sendMessage(chatId, about_message, { parse_mode: 'HTML' });
+        await bot.sendMessage(chatId, about_message, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}});
     }
     if (text === '/my_bookings') {
         const userBookings = await Booking.findAll({
@@ -135,7 +136,7 @@ bot.on('message', async (msg) => {
         try {
             const data = JSON.parse(msg.web_app_data.data);
             let prefix = parseFloat(data?.hours) > 1 ? 'часа' : 'час';
-            let infoMessage = `\nОбщая информация:\n•${data.club}\n• ${data.date}\n• ${data.time}\n• стол №${data.table}\n• ${data.hours} ${prefix}`
+            let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${data.date}\n• ${data.time}\n• стол №${data.table}\n• ${data.hours} ${prefix}`
             let infoMessage1 = `Внутри мы сделали веджи-кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
@@ -148,7 +149,7 @@ bot.on('message', async (msg) => {
                     },
                 }
             )
-            await bot.sendMessage(chatId, finalMessage, { parse_mode: 'HTML' });
+            await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}});
 
         } catch (error) {
             console.error(error);
