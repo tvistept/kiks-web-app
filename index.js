@@ -1,24 +1,17 @@
 const TelegramBot = require('node-telegram-bot-api');
 const apiRouter = require('./api');
-const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
+const { tg_token, google_worksheet_id, google_sheet_id, google_worksheet_id_kiks2, tg_token_kiks2 } = require('/app-configs/tokens.js');
+// const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
-const bot = new TelegramBot(tg_token, { polling: true });
-// const { appendData, getData, writeBookingData } = require('./googleSheets');
+const bot = new TelegramBot(tg_token_kiks2, { polling: true });
 const sequelize = require('./db');
 const { Op } = require('sequelize');
 const models = require('./models');
 const { User, Booking } = models;
-// Импортируем сообщения
 const messages = require('./messages');
-const { chat } = require('googleapis/build/src/apis/chat');
 const { greating_message, rules_message, about_message } = messages;
-// ID вашей Google таблицы и диапазон
-const SPREADSHEET_ID = '1BFLBqnfbybW2YScyarfVjn1GYmPLr0wlcmqCLMq2Rs8';
-const RANGE = 'bookings!A1:E1';
-// Получаем текущую дату с временем 00:00
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00:00.000
-
 const https = require('https');
 const fs = require('fs');
 // Добавьте после импортов
