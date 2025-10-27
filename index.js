@@ -399,7 +399,15 @@ bot.on('message', async (msg) => {
                 }
             )
             await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}});
-            await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+
+            let tableNum = data.table
+            if (data.table = 'DARK ROOM') {
+                tableNum = 7
+            } else if (data.table = 'WOOD ROOM') {
+                tableNum = 8
+            }
+
+            await bookTable(formattedDate, data.time, tableNum, data.hours, data.name, clubId);
 
         } catch (error) {
             console.error(error);
