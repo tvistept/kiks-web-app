@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const apiRouter = require('./api');
 const tg_token = '7579297753:AAGygIX_wPxh2VcJaWe3PSpz12ri3jrCFwM';
-const WEB_APP_URL = 'https://neon-croquembouche-c9efa2.netlify.app';
+const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const bot = new TelegramBot(tg_token, { polling: true });
 // const { appendData, getData, writeBookingData } = require('./googleSheets');
 const sequelize = require('./db');
