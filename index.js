@@ -32,6 +32,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 const http = require('http');
+const e = require('express');
 http.createServer((req, res) => {
   res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
   res.end();
@@ -294,7 +295,10 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
       
       let sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       const startColumn = timeToColumn[bookTime];
-      const startRow = club === 'kiks2' ? parseInt(tableNum) + 2 : parseInt(tableNum) + 1; // Строка = номер стола + 1 если старый кикс, + 2 если новый кикс
+      const startRow = parseInt(tableNum) + 1
+      // const startRow = club === 'kiks2' ? parseInt(tableNum) + 1 : parseInt(tableNum); // Строка = номер стола + 1 если старый кикс, + 2 если новый кикс
+
+      
 
       if (parseInt(hours) === 2) {
           const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
@@ -384,8 +388,16 @@ bot.on('message', async (msg) => {
             const [year, month, day] = dateString.split('-');
             const formattedDate = `${day}.${month}.${year}`;
             let clubId = data.club === 'Каменноостровский 26-28' ? 'kiks2' : 'kiks1';
+            let tableName;
+            if (data.table == 7 ) {
+                tableName = 'DARK ROOM'
+            } else if (data.table == 8) {
+                tableName = 'WOOD ROOM'
+            } else {
+                tableName = `стол № ${data.table}`
+            }
 
-            let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• стол №${data.table}\n• ${data.hours} ${prefix}`
+            let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
             let infoMessage1 = `Внутри мы сделали веджи-кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
@@ -400,12 +412,12 @@ bot.on('message', async (msg) => {
             )
             await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}});
 
-            let tableNum = data.table
-            if (data.table === 'DARK ROOM') {
-                tableNum = 7
-            } else if (data.table === 'WOOD ROOM') {
-                tableNum = 8
-            }
+            // let tableNum = data.table
+            // if (data.table === 'DARK ROOM') {
+            //     tableNum = 7
+            // } else if (data.table === 'WOOD ROOM') {
+            //     tableNum = 8
+            // }
 
             await bookTable(formattedDate, data.time, tableNum, data.hours, data.name, clubId);
 
