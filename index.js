@@ -25,7 +25,7 @@ const fs = require('fs');
 const sslOptions = {
     key: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/fullchain.pem')
-  };
+};
 
 const express = require('express');
 const cors = require('cors');
@@ -45,14 +45,14 @@ app.use('/api', apiRouter); // все API-роуты будут начинать
 
 // Запускаем Express-сервер на другом порту (не 3000)
 const API_PORT = 5000; // Или любой свободный порт
-// Замените app.listen на:
+
 https.createServer(sslOptions, app).listen(
     API_PORT, 
     '0.0.0.0',
     () => {
-      console.log(`HTTPS сервер запущен на https://kiks-app.ru:${API_PORT}`);
+        console.log(`HTTPS сервер запущен на https://kiks-app.ru:${API_PORT}`);
     }
-  );
+);
 
 async function testConnection() {
     try {
@@ -136,7 +136,11 @@ bot.on('message', async (msg) => {
         try {
             const data = JSON.parse(msg.web_app_data.data);
             let prefix = parseFloat(data?.hours) > 1 ? 'часа' : 'час';
-            let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${data.date}\n• ${data.time}\n• стол №${data.table}\n• ${data.hours} ${prefix}`
+            const dateString = data.date;
+            const [year, month, day] = dateString.split('-');
+            const formattedDate = `${day}.${month}.${year}`;
+
+            let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• стол №${data.table}\n• ${data.hours} ${prefix}`
             let infoMessage1 = `Внутри мы сделали веджи-кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
