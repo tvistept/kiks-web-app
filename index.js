@@ -288,9 +288,13 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
           '01:00': 'N'
       };
 
+      if (club == 'kiks1') {
+        return true
+      }
+      
       let sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       const startColumn = timeToColumn[bookTime];
-      const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
+      const startRow = club === 'kiks2' ? parseInt(tableNum) + 2 : parseInt(tableNum) + 1; // Строка = номер стола + 1 если старый кикс, + 2 если новый кикс
 
       if (parseInt(hours) === 2) {
           const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
