@@ -94,6 +94,39 @@ function isWeekend(date) {
     return day === 0 || day === 5 || day === 6; // 0 (воскресенье), 5 (пятница), 6 (суббота)
 }
 
+function getRangeObject(input) {
+  const [sheetName, cellsPart] = input.split('!');
+  const [firstCell, secondCell] = cellsPart.split(':');
+
+  // Извлекаем буквы и цифры из ячеек
+  const letter1 = firstCell.match(/[A-Za-z]+/)[0];
+  const letter2 = secondCell.match(/[A-Za-z]+/)[0];
+  const row = firstCell.match(/\d+/)[0]; // предполагаем, что номер строки одинаков в обоих ячейках
+
+  // Функция для преобразования буквы в индекс (A=0, B=1, ..., Z=25, AA=26, AB=27 и т.д.)
+  function letterToIndex(letter) {
+      let index = 0;
+      letter = letter.toUpperCase();
+      for (let i = 0; i < letter.length; i++) {
+          index = index * 26 + (letter.charCodeAt(i) - 'A'.charCodeAt(0) + 1);
+      }
+      return index - 1; // чтобы A было 0, а не 1
+  }
+
+  const cellIndex1 = letterToIndex(letter1);
+  const cellIndex2 = letterToIndex(letter2);
+
+  const result = {
+      sheetName,
+      firstCell,
+      secondCell,
+      cellIndex1,
+      cellIndex2,
+      row: parseInt(row)
+  };
+  return result
+}
+
 async function appendRow(spreadsheetId, range, values) {
   const resource = { values };
   const response = await sheetsClient.spreadsheets.values.append({
