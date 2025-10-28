@@ -536,16 +536,38 @@ bot.on('callback_query', async (callbackQuery) => {
       let clubId = tableNumDateTime.split('__')[4]
       // let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
 
-      await Booking.destroy({
+      // let startDate = dateFromString(bookDate)
+      // let endDate = dateFromString(bookDate)
+      
+      const originalDate = dateFromString(bookDate);
+      // Копируем исходный объект даты
+      const startDate = new Date(originalDate);
+      const endDate = new Date(originalDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+
+      let booking = await Booking.findOne({
         where: {
           chat_id: chat_id,
-          booking_date: bookDate,
+          booking_date: {[Op.between]: [startDate, endDate]   },
           time: bookTime,
           table: tableNum,
           club_id: clubId,
         },
       });
+
+      await booking.destroy();
       
+      // await Booking.destroy({
+      //   where: {
+      //     chat_id: chat_id,
+      //     booking_date: bookDate,
+      //     time: bookTime,
+      //     table: tableNum,
+      //     club_id: clubId,
+      //   },
+      // });
+
       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
       // deleteUserBookingRow(bookingId)
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
