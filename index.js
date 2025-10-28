@@ -78,6 +78,10 @@ let sheetsClient;
   });
 })();
 
+const editMessage = async(chatId, messageId, text, replyMarkup = null) => {
+  bot.editMessageText(text, {chat_id: chatId, message_id: messageId, reply_markup: replyMarkup, parse_mode: 'HTML', disable_web_page_preview: true, link_preview_options: {is_disabled: true},} )
+}
+
 const dateFormat = new Intl.DateTimeFormat('ru-RU', {
   day: '2-digit',
   month: '2-digit',
@@ -289,6 +293,23 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
           '01:00': 'N'
       };
 
+      if (club === 'kiks2') {
+        timeToColumn = {
+          '14:00': 'C',
+          '15:00': 'D',
+          '16:00': 'E',
+          '17:00': 'F',
+          '18:00': 'G',
+          '19:00': 'H',
+          '20:00': 'I',
+          '21:00': 'J',
+          '22:00': 'K',
+          '23:00': 'L',
+          '00:00': 'M',
+          '01:00': 'N'
+        };
+      }
+
       if (club == 'kiks1') {
         return true
       }
@@ -312,6 +333,74 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
       return false
     }
     
+}
+
+async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) { 
+    try {
+      // Определяем колонку для времени
+      let timeToColumn = {}
+      isWeekend(dateFromString(bookDate)) ? timeToColumn = {
+          '12:00': 'C',
+          '13:00': 'D',
+          '14:00': 'E',
+          '15:00': 'F',
+          '16:00': 'G',
+          '17:00': 'H',
+          '18:00': 'I',
+          '19:00': 'J',
+          '20:00': 'K',
+          '21:00': 'L',
+          '22:00': 'M',
+          '23:00': 'N',
+          '00:00': 'O',
+          '01:00': 'P',
+      } : timeToColumn = {
+          '14:00': 'C',
+          '15:00': 'D',
+          '16:00': 'E',
+          '17:00': 'F',
+          '18:00': 'G',
+          '19:00': 'H',
+          '20:00': 'I',
+          '21:00': 'J',
+          '22:00': 'K',
+          '23:00': 'L',
+          '00:00': 'M',
+          '01:00': 'N'
+      };
+
+      if (clubId === 'kiks2') {
+        timeToColumn = {
+          '14:00': 'C',
+          '15:00': 'D',
+          '16:00': 'E',
+          '17:00': 'F',
+          '18:00': 'G',
+          '19:00': 'H',
+          '20:00': 'I',
+          '21:00': 'J',
+          '22:00': 'K',
+          '23:00': 'L',
+          '00:00': 'M',
+          '01:00': 'N'
+        };
+      }
+
+      let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+      const startColumn = timeToColumn[bookTime];
+      const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
+
+      if (parseInt(hours) === 2) {
+          const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
+          await writeToRange(spreadsheetId, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, ['', ''], true);
+      } else {
+        await writeToCell(spreadsheetId, `${bookDate}!${startColumn}${startRow}`, '');
+      }
+      return true
+    } catch (error) {
+      console.log(error)
+      return false
+    }
 }
 
 bot.on('message', async (msg) => {
@@ -398,7 +487,7 @@ bot.on('message', async (msg) => {
             }
 
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
-            let infoMessage1 = `Внутри мы сделали веджи-кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
+            let infoMessage1 = `Внутри мы сделали кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU')});
@@ -410,19 +499,61 @@ bot.on('message', async (msg) => {
                     },
                 }
             )
-            await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}});
 
-            // let tableNum = data.table
-            // if (data.table === 'DARK ROOM') {
-            //     tableNum = 7
-            // } else if (data.table === 'WOOD ROOM') {
-            //     tableNum = 8
-            // }
-
+            let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+            let sheetLink = await getSheetLink(bookDate, spreadsheetId)
+            const BUTTONS_BOOK_READY = {
+              "inline_keyboard": [
+                [
+                  {text: 'проверить бронь', url:sheetLink},
+                ],
+                [
+                  {text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}`},
+                ],
+              ]
+            }
+            
+            await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, reply_markup: BUTTONS_BOOK_READY});
             await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
 
         } catch (error) {
             console.error(error);
         }
     }
+});
+
+bot.on('callback_query', async (callbackQuery) => {
+  try {
+    let chat_id = callbackQuery.message.chat.id
+    let messageText = callbackQuery.data
+
+    if (messageText.includes('deleteBron')) {
+      let tableNumDateTime = messageText.replace('deleteBron_','')
+      let tableNum = tableNumDateTime.split('__')[0]
+      let bookDate = tableNumDateTime.split('__')[1]
+      let bookTime = tableNumDateTime.split('__')[2]
+      let bookHours = tableNumDateTime.split('__')[3]
+      let clubId = tableNumDateTime.split('__')[4]
+      // let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
+
+      deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
+      // deleteUserBookingRow(bookingId)
+      editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`, BUTTONS_RETURN_BACK_FROM_DELETION)
+    }
+  } catch (error) {
+    console.error('Callback error:', error);
+    try {
+      await bot.answerCallbackQuery(callbackQuery.id, {
+        text: 'Произошла ошибка, попробуйте позже',
+        show_alert: true
+      });
+    } catch (e) {
+      console.error('Failed to send error to user:', e);
+    }
+  } finally {
+    // Принудительно освобождаем ресурсы
+    if (callbackQuery.message) {
+      callbackQuery.message = null;
+    }
+  }
 });
