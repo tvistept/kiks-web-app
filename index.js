@@ -490,7 +490,7 @@ bot.on('message', async (msg) => {
             let infoMessage1 = `Внутри мы сделали кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
-            await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU')});
+            await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
             await User.update(
                 { firstName:  data.name, phone: data.phone }, // Новые значения для обновления
                 {
@@ -536,9 +536,19 @@ bot.on('callback_query', async (callbackQuery) => {
       let clubId = tableNumDateTime.split('__')[4]
       // let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
 
+      await Booking.destroy({
+        where: {
+          chat_id: chat_id,
+          booking_date: bookDate,
+          time: bookTime,
+          table: tableNum,
+          club_id: clubId,
+        },
+      });
+      
       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
       // deleteUserBookingRow(bookingId)
-      editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`, BUTTONS_RETURN_BACK_FROM_DELETION)
+      editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
   } catch (error) {
     console.error('Callback error:', error);

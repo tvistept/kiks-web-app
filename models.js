@@ -58,6 +58,10 @@ const Booking = sequelize.define('Booking', {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    club_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   }, {
     // Дополнительные настройки модели
     tableName: 'bookings', // Название таблицы в базе данных
