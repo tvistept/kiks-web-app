@@ -501,7 +501,7 @@ bot.on('message', async (msg) => {
             )
 
             let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-            let sheetLink = await getSheetLink(bookDate, spreadsheetId)
+            let sheetLink = await getSheetLink(formattedDate, spreadsheetId)
             const BUTTONS_BOOK_READY = {
               "inline_keyboard": [
                 [
