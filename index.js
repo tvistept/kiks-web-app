@@ -469,6 +469,29 @@ bot.on('message', async (msg) => {
         // Отправляем данные пользователю
         await bot.sendMessage(chatId, message);
     }
+    if (text === '/test`') {
+
+      const message = `👋 Привет, ${msg.from.first_name || 'друг'}! Добро пожаловать в Mini App 👇`;
+      const options = {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '🚀 Открыть Mini App',
+                web_app: {
+                  url: { url: `${WEB_APP_URL}?user_id=${chatId}` },
+                },
+              },
+            ],
+          ],
+        },
+      };
+
+      bot.sendMessage(chatId, message, options); 
+    }
+
+
+
     if (msg?.web_app_data?.data) {
         try {
             const data = JSON.parse(msg.web_app_data.data);
