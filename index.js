@@ -471,7 +471,7 @@ bot.on('message', async (msg) => {
     }
     if (text === '/test`') {
 
-      const message = `👋 Привет, ${msg.from.first_name || 'друг'}! Добро пожаловать в Mini App 👇`;
+      const message = `👋 Привет, друг! Добро пожаловать в Mini App 👇`;
       const options = {
         reply_markup: {
           inline_keyboard: [
