@@ -408,65 +408,26 @@ bot.on('message', async (msg) => {
     const text = msg.text;
 
     if (text === '/start') {
-      const userToReturn = await User.findOne({ where: { chat_id: chatId } });
-      let userName = userToReturn?.firstName || null;
+        const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
+        if (!userToReturn?.chat_id) {
+            await User.create({ chat_id: chatId, firstName: msg.chat.username });
+            userName = null
+        } else {
+            userName = userToReturn.firstName
+        }
 
-      if (!userToReturn?.chat_id) {
-        await User.create({ chat_id: chatId, firstName: msg.chat.username });
-      }
-
-      const salutMessage = userName ? `Салют, ${userName}!\n\n` : `Салют!\n\n`;
-
-      // Постоянная reply-клавиатура
-      await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, {
-        reply_markup: {
-          keyboard: [
-            [{ text: 'Прикинуть кий к носу' }], // обычная кнопка, не web_app!
-          ],
-          resize_keyboard: true,
-          one_time_keyboard: false,
-        },
-      });
+        let salutMessage = userName ? `Салют, ${userName}!\n\n` : `Салют!\n\n`
+        await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, {
+            reply_markup: {
+                keyboard: [
+                    [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                ],
+                "resize_keyboard": true,
+                "selective": false,
+                "one_time_keyboard": false,
+            }
+        });
     }
-
-    // Отдельно ловим нажатие кнопки "Прикинуть кий к носу"
-    if (text === 'Прикинуть кий к носу') {
-      await bot.sendMessage(chatId, "🚀 Открой Mini App:", {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: 'Открыть Mini App',
-                web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` },
-              },
-            ],
-          ],
-        },
-      });
-    }
-
-
-    // if (text === '/start') {
-    //     const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
-    //     if (!userToReturn?.chat_id) {
-    //         await User.create({ chat_id: chatId, firstName: msg.chat.username });
-    //         userName = null
-    //     } else {
-    //         userName = userToReturn.firstName
-    //     }
-
-    //     let salutMessage = userName ? `Салют, ${userName}!\n\n` : `Салют!\n\n`
-    //     await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, {
-    //         reply_markup: {
-    //             keyboard: [
-    //                 [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
-    //             ],
-    //             "resize_keyboard": true,
-    //             "selective": false,
-    //             "one_time_keyboard": false,
-    //         }
-    //     });
-    // }
     if (text === '/rules') {
         await bot.sendMessage(chatId, rules_message,  {
             reply_markup: {
