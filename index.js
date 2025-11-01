@@ -469,7 +469,7 @@ bot.on('message', async (msg) => {
         // Отправляем данные пользователю
         await bot.sendMessage(chatId, message);
     }
-    if (text === '/test`') {
+    if (text === '/test') {
       const message = `👋 Привет, друг! Добро пожаловать в Mini App 👇`;
       const options = {
         reply_markup: {
