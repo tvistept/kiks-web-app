@@ -423,7 +423,8 @@ bot.on('message', async (msg) => {
                     [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
                 ],
                 "resize_keyboard": true,
-                "one_time_keyboard": false
+                "selective": false,
+                "one_time_keyboard": false,
             }
         });
     }
@@ -434,7 +435,8 @@ bot.on('message', async (msg) => {
                     [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
                 ],
                 "resize_keyboard": true,
-                "one_time_keyboard": false
+                "selective": false,
+                "one_time_keyboard": false,
             }
         });
     }
@@ -451,7 +453,8 @@ bot.on('message', async (msg) => {
                 [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
             ],
             "resize_keyboard": true,
-            "one_time_keyboard": false
+            "one_time_keyboard": false,
+            "selective": false,
           }
         });
     }
