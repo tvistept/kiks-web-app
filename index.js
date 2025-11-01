@@ -478,7 +478,7 @@ bot.on('message', async (msg) => {
               {
                 text: '🚀 Открыть Mini App',
                 web_app: {
-                  url: { url: `${WEB_APP_URL}?user_id=${chatId}` },
+                  url: `${WEB_APP_URL}?user_id=${chatId}` ,
                 },
               },
             ],
