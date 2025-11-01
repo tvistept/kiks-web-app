@@ -422,17 +422,38 @@ bot.on('message', async (msg) => {
                 keyboard: [
                     [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
                 ],
-                "resize_keyboard": true
+                "resize_keyboard": true,
+                "one_time_keyboard": false
             }
         });
     }
     if (text === '/rules') {
-        await bot.sendMessage(chatId, rules_message);
+        await bot.sendMessage(chatId, rules_message,  {
+            reply_markup: {
+                keyboard: [
+                    [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                ],
+                "resize_keyboard": true,
+                "one_time_keyboard": false
+            }
+        });
     }
     if (text === '/about') {
         // const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
         // await bot.sendMessage(chatId, about_message, { parse_mode: 'HTML' });
-        await bot.sendMessage(chatId, about_message, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}});
+        await bot.sendMessage(chatId, about_message, {
+          parse_mode: 'HTML', 
+          no_webpage:true, 
+          disable_web_page_preview:true, 
+          link_preview_options: {is_disabled: true},
+          reply_markup: {
+            keyboard: [
+                [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+            ],
+            "resize_keyboard": true,
+            "one_time_keyboard": false
+          }
+        });
     }
     if (text === '/my_bookings') {
         const userBookings = await Booking.findAll({
