@@ -470,7 +470,6 @@ bot.on('message', async (msg) => {
         await bot.sendMessage(chatId, message);
     }
     if (text === '/test`') {
-
       const message = `👋 Привет, друг! Добро пожаловать в Mini App 👇`;
       const options = {
         reply_markup: {
@@ -487,7 +486,7 @@ bot.on('message', async (msg) => {
         },
       };
 
-      bot.sendMessage(chatId, message, options); 
+      await bot.sendMessage(chatId, message, options); 
     }
 
 
