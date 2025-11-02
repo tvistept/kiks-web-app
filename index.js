@@ -404,6 +404,7 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
 }
 
 bot.on('message', async (msg) => {
+    console.log('🟢 Получено сообщение:', JSON.stringify(msg, null, 2));
     const chatId = msg.chat.id;
     const text = msg.text;
 
