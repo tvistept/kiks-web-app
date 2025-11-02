@@ -424,7 +424,7 @@ bot.on('message', async (msg) => {
                 {
                   text: '🚀 ПРикинуть кий к носу 🚀 ',
                   web_app: {
-                    url: `${WEB_APP_URL}?user_id=${chatId}`,
+                    url: `${WEB_APP_URL}`,
                   },
                 },
               ],
