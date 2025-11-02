@@ -422,7 +422,7 @@ bot.on('message', async (msg) => {
             inline_keyboard: [
               [
                 {
-                  text: '🚀 ПРикинуть кий к носу 🚀 ',
+                  text: '🚀 Прикинуть кий к носу 🚀 ',
                   web_app: {
                     url: `${WEB_APP_URL}`,
                   },
@@ -522,6 +522,7 @@ bot.on('message', async (msg) => {
 
 
     if (msg?.web_app_data?.data) {
+        console.log('📦 Получены данные из Mini App:', msg.web_app_data.data);
         try {
             const data = JSON.parse(msg.web_app_data.data);
             let prefix = parseFloat(data?.hours) > 1 ? 'часа' : 'час';
