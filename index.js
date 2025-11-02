@@ -404,7 +404,6 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
 }
 
 bot.on('message', async (msg) => {
-    console.log('🟢 Получено сообщение:', JSON.stringify(msg, null, 2));
     const chatId = msg.chat.id;
     const text = msg.text;
 
@@ -418,22 +417,17 @@ bot.on('message', async (msg) => {
         }
 
         let salutMessage = userName ? `Салют, ${userName}!\n\n` : `Салют!\n\n`
-        const options = {
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: '🚀 Прикинуть кий к носу 🚀 ',
-                  web_app: {
-                    url: `${WEB_APP_URL}`,
-                  },
-                },
-              ],
-            ],
-          },
-        };
-
-        await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, options);
+        await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, {
+            reply_markup: {
+                keyboard: [
+                    [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                ],
+                "resize_keyboard": true,
+                "selective": false,
+                "one_time_keyboard": false,
+                "is_persistent": true,
+            }
+        });
     }
     if (text === '/rules') {
         await bot.sendMessage(chatId, rules_message,  {
@@ -523,7 +517,6 @@ bot.on('message', async (msg) => {
 
 
     if (msg?.web_app_data?.data) {
-        console.log('📦 Получены данные из Mini App:', msg.web_app_data.data);
         try {
             const data = JSON.parse(msg.web_app_data.data);
             let prefix = parseFloat(data?.hours) > 1 ? 'часа' : 'час';
@@ -576,70 +569,70 @@ bot.on('message', async (msg) => {
     }
 });
 
-// bot.on('callback_query', async (callbackQuery) => {
-//   try {
-//     let chat_id = callbackQuery.message.chat.id
-//     let messageText = callbackQuery.data
+bot.on('callback_query', async (callbackQuery) => {
+  try {
+    let chat_id = callbackQuery.message.chat.id
+    let messageText = callbackQuery.data
 
-//     if (messageText.includes('deleteBron')) {
-//       let tableNumDateTime = messageText.replace('deleteBron_','')
-//       let tableNum = tableNumDateTime.split('__')[0]
-//       let bookDate = tableNumDateTime.split('__')[1]
-//       let bookTime = tableNumDateTime.split('__')[2]
-//       let bookHours = tableNumDateTime.split('__')[3]
-//       let clubId = tableNumDateTime.split('__')[4]
-//       // let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
+    if (messageText.includes('deleteBron')) {
+      let tableNumDateTime = messageText.replace('deleteBron_','')
+      let tableNum = tableNumDateTime.split('__')[0]
+      let bookDate = tableNumDateTime.split('__')[1]
+      let bookTime = tableNumDateTime.split('__')[2]
+      let bookHours = tableNumDateTime.split('__')[3]
+      let clubId = tableNumDateTime.split('__')[4]
+      // let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
 
-//       // let startDate = dateFromString(bookDate)
-//       // let endDate = dateFromString(bookDate)
+      // let startDate = dateFromString(bookDate)
+      // let endDate = dateFromString(bookDate)
       
-//       const originalDate = dateFromString(bookDate);
-//       // Копируем исходный объект даты
-//       const startDate = new Date(originalDate);
-//       const endDate = new Date(originalDate);
-//       startDate.setHours(0, 0, 0, 0);
-//       endDate.setHours(23, 59, 59, 999);
+      const originalDate = dateFromString(bookDate);
+      // Копируем исходный объект даты
+      const startDate = new Date(originalDate);
+      const endDate = new Date(originalDate);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
 
-//       let booking = await Booking.findOne({
-//         where: {
-//           chat_id: chat_id,
-//           booking_date: {[Op.between]: [startDate, endDate]   },
-//           time: bookTime,
-//           table: tableNum,
-//           club_id: clubId,
-//         },
-//       });
+      let booking = await Booking.findOne({
+        where: {
+          chat_id: chat_id,
+          booking_date: {[Op.between]: [startDate, endDate]   },
+          time: bookTime,
+          table: tableNum,
+          club_id: clubId,
+        },
+      });
 
-//       await booking.destroy();
+      await booking.destroy();
       
-//       // await Booking.destroy({
-//       //   where: {
-//       //     chat_id: chat_id,
-//       //     booking_date: bookDate,
-//       //     time: bookTime,
-//       //     table: tableNum,
-//       //     club_id: clubId,
-//       //   },
-//       // });
+      // await Booking.destroy({
+      //   where: {
+      //     chat_id: chat_id,
+      //     booking_date: bookDate,
+      //     time: bookTime,
+      //     table: tableNum,
+      //     club_id: clubId,
+      //   },
+      // });
 
-//       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
-//       // deleteUserBookingRow(bookingId)
-//       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
-//     }
-//   } catch (error) {
-//     console.error('Callback error:', error);
-//     try {
-//       await bot.answerCallbackQuery(callbackQuery.id, {
-//         text: 'Произошла ошибка, попробуйте позже',
-//         show_alert: true
-//       });
-//     } catch (e) {
-//       console.error('Failed to send error to user:', e);
-//     }
-//   } finally {
-//     // Принудительно освобождаем ресурсы
-//     if (callbackQuery.message) {
-//       callbackQuery.message = null;
-//     }
-//   }
-// });
+      deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
+      // deleteUserBookingRow(bookingId)
+      editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
+    }
+  } catch (error) {
+    console.error('Callback error:', error);
+    try {
+      await bot.answerCallbackQuery(callbackQuery.id, {
+        text: 'Произошла ошибка, попробуйте позже',
+        show_alert: true
+      });
+    } catch (e) {
+      console.error('Failed to send error to user:', e);
+    }
+  } finally {
+    // Принудительно освобождаем ресурсы
+    if (callbackQuery.message) {
+      callbackQuery.message = null;
+    }
+  }
+});
