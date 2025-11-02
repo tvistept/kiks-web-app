@@ -417,16 +417,22 @@ bot.on('message', async (msg) => {
         }
 
         let salutMessage = userName ? `Салют, ${userName}!\n\n` : `Салют!\n\n`
-        await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, {
-            reply_markup: {
-                keyboard: [
-                    [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
-                ],
-                "resize_keyboard": true,
-                "selective": false,
-                "one_time_keyboard": false,
-            }
-        });
+        const options = {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '🚀 ПРикинуть кий к носу 🚀 ',
+                  web_app: {
+                    url: `${WEB_APP_URL}?user_id=${chatId}`,
+                  },
+                },
+              ],
+            ],
+          },
+        };
+
+        await bot.sendMessage(chatId, `${salutMessage}${greating_message}`, options);
     }
     if (text === '/rules') {
         await bot.sendMessage(chatId, rules_message,  {
