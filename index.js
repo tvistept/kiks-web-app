@@ -96,7 +96,7 @@ function dateFromString(dateString) {
 
 function isWeekend(date) {
     const day = date.getDay(); // 0 - воскресенье, 1 - понедельник, ..., 6 - суббота
-    return day === 0 || day === 5 || day === 6; // 0 (воскресенье), 5 (пятница), 6 (суббота)
+    return day === 0 || day === 6; // 0 (воскресенье), 5 (пятница), 6 (суббота)
 }
 
 function getRangeObject(input) {
@@ -159,7 +159,6 @@ async function writeToCell(spreadsheetId, range, value) {
 
 async function mergeCells(sheets, range, spreadsheetId) {
   const { sheetName, cellIndex1, cellIndex2, row } = getRangeObject(range);
-//   const spreadsheetId = USER_SHEET_ID;
 
   // Получаем sheetId по имени листа
   const sheetRes = await sheets.spreadsheets.get({ spreadsheetId });
@@ -292,34 +291,10 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
           '00:00': 'M',
           '01:00': 'N'
       };
-
-      if (club === 'kiks2') {
-        timeToColumn = {
-          '14:00': 'C',
-          '15:00': 'D',
-          '16:00': 'E',
-          '17:00': 'F',
-          '18:00': 'G',
-          '19:00': 'H',
-          '20:00': 'I',
-          '21:00': 'J',
-          '22:00': 'K',
-          '23:00': 'L',
-          '00:00': 'M',
-          '01:00': 'N'
-        };
-      }
-
-      // if (club == 'kiks1') {
-      //   return true
-      // }
       
       let sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1
-      // const startRow = club === 'kiks2' ? parseInt(tableNum) + 1 : parseInt(tableNum); // Строка = номер стола + 1 если старый кикс, + 2 если новый кикс
-
-      
 
       if (parseInt(hours) === 2) {
           const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
@@ -438,12 +413,11 @@ bot.on('message', async (msg) => {
                 "resize_keyboard": true,
                 "selective": false,
                 "one_time_keyboard": false,
+                "is_persistent": true,
             }
         });
     }
     if (text === '/about') {
-        // const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
-        // await bot.sendMessage(chatId, about_message, { parse_mode: 'HTML' });
         await bot.sendMessage(chatId, about_message, {
           parse_mode: 'HTML', 
           no_webpage:true, 
@@ -456,6 +430,7 @@ bot.on('message', async (msg) => {
             "resize_keyboard": true,
             "one_time_keyboard": false,
             "selective": false,
+            "is_persistent": true,
           }
         });
     }
@@ -489,10 +464,25 @@ bot.on('message', async (msg) => {
         
         let message = "Твои брони:\n\n";
         userBookings.forEach((booking, index) => {
-        message += formatBooking(booking, index);
+          message += formatBooking(booking, index);
         });
+
         // Отправляем данные пользователю
-        await bot.sendMessage(chatId, message);
+        await bot.sendMessage(chatId, message, {
+          parse_mode: 'HTML', 
+          no_webpage:true, 
+          disable_web_page_preview:true, 
+          link_preview_options: {is_disabled: true},
+          reply_markup: {
+            keyboard: [
+                [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+            ],
+            "resize_keyboard": true,
+            "one_time_keyboard": false,
+            "selective": false,
+            "is_persistent": true,
+          }
+        });
     }
     if (text === '/test') {
       const message = `👋 Привет, друг! Добро пожаловать в Mini App 👇`;
@@ -581,12 +571,8 @@ bot.on('callback_query', async (callbackQuery) => {
       let bookTime = tableNumDateTime.split('__')[2]
       let bookHours = tableNumDateTime.split('__')[3]
       let clubId = tableNumDateTime.split('__')[4]
-      // let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
-
-      // let startDate = dateFromString(bookDate)
-      // let endDate = dateFromString(bookDate)
-      
       const originalDate = dateFromString(bookDate);
+
       // Копируем исходный объект даты
       const startDate = new Date(originalDate);
       const endDate = new Date(originalDate);
@@ -604,19 +590,7 @@ bot.on('callback_query', async (callbackQuery) => {
       });
 
       await booking.destroy();
-      
-      // await Booking.destroy({
-      //   where: {
-      //     chat_id: chat_id,
-      //     booking_date: bookDate,
-      //     time: bookTime,
-      //     table: tableNum,
-      //     club_id: clubId,
-      //   },
-      // });
-
       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
-      // deleteUserBookingRow(bookingId)
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
   } catch (error) {
