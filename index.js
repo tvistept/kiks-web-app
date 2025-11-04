@@ -310,9 +310,9 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
         };
       }
 
-      if (club == 'kiks1') {
-        return true
-      }
+      // if (club == 'kiks1') {
+      //   return true
+      // }
       
       let sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       const startColumn = timeToColumn[bookTime];
@@ -514,8 +514,6 @@ bot.on('message', async (msg) => {
       await bot.sendMessage(chatId, message, options); 
     }
 
-
-
     if (msg?.web_app_data?.data) {
         try {
             const data = JSON.parse(msg.web_app_data.data);
@@ -533,9 +531,11 @@ bot.on('message', async (msg) => {
                 tableName = `стол № ${data.table}`
             }
 
+            let kiksManager = clubId === 'kiks2' ? `<a href="https://t.me/KiksPetra">Киксу</a>` : '<a href="https://t.me/kiks_book">Киксу</a>'
+
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
             let infoMessage1 = `Внутри мы сделали кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
-            let infoMessage2 = `P.S. Если ты опаздываешь, напиши <a href="https://t.me/kiks_book">Киксу</a>, он держит бронь только 15 минут.`
+            let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
             await User.update(
