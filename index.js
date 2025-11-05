@@ -356,8 +356,7 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '01:00': 'N'
       };
 
-      console.log(USER2_SHEET_ID, USER1_SHEET_ID)
-
+      console.log(`kiks1=${USER1_SHEET_ID}`, `kiks2=${USER2_SHEET_ID}`)
       let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       console.log(spreadsheetId)
 
@@ -366,8 +365,6 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
 
       if (parseInt(hours) === 2) {
           const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
-
-          console.log(startColumn, startRow, nextColumn, startRow)
           await writeToRange(spreadsheetId, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, ['', ''], true);
       } else {
         await writeToCell(spreadsheetId, `${bookDate}!${startColumn}${startRow}`, '');
@@ -377,6 +374,56 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
       console.log(error)
       return false
     }
+}
+
+async function deleteUserBookingRow(bookingId) {
+  const spreadsheetId = SERVICE_SHEET_ID;
+  const sheetName = 'userBooking';
+  const valueToDelete = bookingId;
+
+  // Получаем sheetId
+  const spreadsheet = await sheetsClient.spreadsheets.get({ spreadsheetId });
+  const sheet = spreadsheet.data.sheets.find(s => s.properties.title === sheetName);
+  const sheetId = sheet.properties.sheetId;
+
+  // Получаем все строки
+  const res = await sheetsClient.spreadsheets.values.get({
+    spreadsheetId,
+    range: sheetName,
+  });
+  const rows = res.data.values;
+
+  // Ищем нужную строку (столбец F, индекс 5)
+  let rowIndexToDelete = null;
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][5] === valueToDelete) {
+      rowIndexToDelete = i;
+      break;
+    }
+  }
+
+  if (rowIndexToDelete !== null) {
+    await sheetsClient.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId: sheetId,
+                dimension: 'ROWS',
+                startIndex: rowIndexToDelete,
+                endIndex: rowIndexToDelete + 1,
+              },
+            },
+          },
+        ],
+      },
+    });
+    console.log('Строка удалена');
+  } else {
+    console.log('Строка не найдена');
+  }
 }
 
 bot.on('message', async (msg) => {
@@ -595,8 +642,11 @@ bot.on('callback_query', async (callbackQuery) => {
       });
 
       await booking.destroy();
-      console.log(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, `${clubId}444`)
-      deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
+
+
+      let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
+      deleteUserBookingRow(bookingId)
+      deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), clubId)
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
   } catch (error) {
