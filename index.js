@@ -585,6 +585,7 @@ bot.on('callback_query', async (callbackQuery) => {
       });
 
       await booking.destroy();
+      console.log(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
