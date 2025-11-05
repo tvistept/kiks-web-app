@@ -355,7 +355,7 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '01:00': 'N'
       };
 
-      let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+      let spreadsheetId = clubId.trim() === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
 
@@ -590,7 +590,7 @@ bot.on('callback_query', async (callbackQuery) => {
       });
 
       await booking.destroy();
-      console.log(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
+      console.log(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, `${clubId}444`)
       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), chat_id, clubId)
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
