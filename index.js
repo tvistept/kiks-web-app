@@ -350,29 +350,14 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '01:00': 'N'
       };
 
-      if (clubId === 'kiks2') {
-        timeToColumn = {
-          '14:00': 'C',
-          '15:00': 'D',
-          '16:00': 'E',
-          '17:00': 'F',
-          '18:00': 'G',
-          '19:00': 'H',
-          '20:00': 'I',
-          '21:00': 'J',
-          '22:00': 'K',
-          '23:00': 'L',
-          '00:00': 'M',
-          '01:00': 'N'
-        };
-      }
-
       let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
 
       if (parseInt(hours) === 2) {
           const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
+
+          console.log(startColumn, startRow, nextColumn, startRow)
           await writeToRange(spreadsheetId, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, ['', ''], true);
       } else {
         await writeToCell(spreadsheetId, `${bookDate}!${startColumn}${startRow}`, '');
