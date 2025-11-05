@@ -322,6 +322,7 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
 }
 
 async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) { 
+    console.log(bookDate, bookTime, tableNum, hours, clubId)
     try {
       // Определяем колонку для времени
       let timeToColumn = {}
@@ -355,7 +356,11 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '01:00': 'N'
       };
 
-      let spreadsheetId = clubId.trim() === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+      console.log(USER2_SHEET_ID, USER1_SHEET_ID)
+
+      let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+      console.log(spreadsheetId)
+
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
 
