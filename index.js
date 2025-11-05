@@ -524,7 +524,7 @@ bot.on('message', async (msg) => {
             let kiksManager = clubId === 'kiks2' ? `<a href="https://t.me/KiksPetra">Киксу</a>` : '<a href="https://t.me/kiks_book">Киксу</a>'
 
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
-            let infoMessage1 = `Внутри мы сделали кухню и пивной крафтовый бар. Просим, не приносить свою еду и напитки.`
+            let infoMessage1 = `У нас есть кухня (до 23:00) и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
