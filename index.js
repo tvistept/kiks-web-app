@@ -99,6 +99,12 @@ function isWeekend(date) {
     return day === 0 || day === 6; // 0 (воскресенье), 5 (пятница), 6 (суббота)
 }
 
+function generateBookingId(chatId, bookDate, bookTime, tableNum) {
+  bookDate = bookDate.replaceAll('.','')
+  bookTime = bookTime.replaceAll(':','')
+  return `${chatId}${bookDate}${bookTime}${tableNum}`
+}
+
 function getRangeObject(input) {
   const [sheetName, cellsPart] = input.split('!');
   const [firstCell, secondCell] = cellsPart.split(':');
@@ -552,6 +558,10 @@ bot.on('message', async (msg) => {
             
             await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, reply_markup: BUTTONS_BOOK_READY});
             await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+
+            let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
+            let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time,null, clubId, null]];
+            await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
 
         } catch (error) {
             console.error(error);
