@@ -233,17 +233,11 @@ async function getSheetLink(sheetName, spreadsheetId) {
 async function unmergeCells(sheets, range, spreadsheetId) {
   const { sheetName, cellIndex1, cellIndex2, row } = getRangeObject(range);
   console.log(range)
-  console.log(spreadsheetId)
-  console.log(sheetName, cellIndex1, cellIndex2, row)
-  
 
   // Получаем sheetId по имени листа
   const sheetRes = await sheets.spreadsheets.get({ spreadsheetId });
   const sheet = sheetRes.data.sheets.find(s => s.properties.title === sheetName);
   const sheetIdToUnmerge = sheet.properties.sheetId;
-
-  console.log(sheetIdToUnmerge)
-
   // Формируем запрос на объединение A2:B2 (строка 2 = индекс 1, столбцы A=0, B=1)
   const request = {
     spreadsheetId,
@@ -254,7 +248,7 @@ async function unmergeCells(sheets, range, spreadsheetId) {
             range: {
               sheetId:sheetIdToUnmerge,
               startRowIndex: row-1,    // строка 2 (индексация с 0)
-              endRowIndex: row-1,      // до строки 3 (не включая)
+              endRowIndex: row,      // до строки 3 (не включая)
               startColumnIndex: cellIndex1, // столбец A (индексация с 0)
               endColumnIndex: cellIndex2+1    // до столбца C (не включая)
             },
@@ -322,7 +316,6 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
 }
 
 async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) { 
-    console.log(bookDate, bookTime, tableNum, hours, clubId)
     try {
       // Определяем колонку для времени
       let timeToColumn = {}
@@ -356,10 +349,7 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '01:00': 'N'
       };
 
-      console.log(`kiks1=${USER1_SHEET_ID}`, `kiks2=${USER2_SHEET_ID}`)
       let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-      console.log(spreadsheetId)
-
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
 
