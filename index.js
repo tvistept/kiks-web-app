@@ -595,6 +595,7 @@ bot.on('message', async (msg) => {
                         "is_persistent": true,
                     }
                 });
+                return;
               } 
             } catch (error) {
               console.error(error);
