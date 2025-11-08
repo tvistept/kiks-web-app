@@ -582,15 +582,26 @@ bot.on('message', async (msg) => {
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
-              console.log(existingBooking)
+
+              if (existingBooking) {
+                await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {
+                    reply_markup: {
+                        keyboard: [
+                            [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                        ],
+                        "resize_keyboard": true,
+                        "selective": false,
+                        "one_time_keyboard": false,
+                        "is_persistent": true,
+                    }
+                });
+              } 
             } catch (error) {
               console.error(error);
             }
 
             
-            // if (existingBooking) {
-              // await bot.sendMessage(chatId, 'Извини, кто-то уже успел забронировать на это время. Попробуй другой слот.', {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, });
-            // } 
+            
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
             await User.update(
                 { firstName:  data.name, phone: data.phone }, // Новые значения для обновления
