@@ -577,7 +577,7 @@ bot.on('message', async (msg) => {
               let getBookingTime = (time, subtracter) => {
                 let [hours, minutes, seconds] = time.split(':');
                 hours = parseInt(hours) + subtracter;
-                return newTime = `${hours}:${minutes}:${seconds}`;
+                return newTime = `${hours}:00:00`;
               }
 
               let  existingBooking  = await Booking.findOne({ 
