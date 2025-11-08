@@ -567,8 +567,14 @@ bot.on('message', async (msg) => {
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
 
-            let  existingBooking  = await Booking.findOne({ where: { club_id: clubId, time: data.time, table: date.table  } });
-            console.log(existingBooking)
+            try {
+              let  existingBooking  = await Booking.findOne({ where: { club_id: clubId, time: data.time, table: data.table  } });
+              console.log(existingBooking)
+            } catch (error) {
+              console.error(error);
+            }
+
+            
             // if (existingBooking) {
               // await bot.sendMessage(chatId, 'Извини, кто-то уже успел забронировать на это время. Попробуй другой слот.', {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, });
             // } 
