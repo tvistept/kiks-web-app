@@ -574,6 +574,12 @@ bot.on('message', async (msg) => {
               startDate.setHours(0, 0, 0, 0);
               endDate.setHours(23, 59, 59, 999);
 
+              let getBookingTime = (time, subtracter) => {
+                let [hours, minutes, seconds] = time.split(':');
+                hours = parseInt(hours) + subtracter;
+                return newTime = `${hours}:${minutes}:${seconds}`;
+              }
+
               let  existingBooking  = await Booking.findOne({ 
                 where: { 
                   club_id: clubId, 
@@ -583,7 +589,29 @@ bot.on('message', async (msg) => {
                 } 
               });
 
-              if (existingBooking) {
+              let existingBookingPreviousHour = await Booking.findOne({ 
+                where: { 
+                  club_id: clubId, 
+                  time: getBookingTime(data.time, -1), 
+                  table: data.table,
+                  hours: 2,
+                  booking_date: {[Op.between]: [startDate, endDate]   }, 
+                } 
+              });
+
+              let existingBookingNextHour = null
+              if (data.hours == 2) {
+                existingBookingNextHour = await Booking.findOne({ 
+                  where: { 
+                    club_id: clubId, 
+                    time: getBookingTime(data.time, 1), 
+                    table: data.table,
+                    booking_date: {[Op.between]: [startDate, endDate]   }, 
+                  } 
+                });
+              }
+
+              if (existingBooking || existingBookingPreviousHour || existingBookingNextHour) {
                 await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {
                     reply_markup: {
                         keyboard: [
@@ -600,8 +628,6 @@ bot.on('message', async (msg) => {
             } catch (error) {
               console.error(error);
             }
-
-            
             
             await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
             await User.update(
