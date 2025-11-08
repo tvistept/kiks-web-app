@@ -568,7 +568,20 @@ bot.on('message', async (msg) => {
             let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
 
             try {
-              let  existingBooking  = await Booking.findOne({ where: { club_id: clubId, time: data.time, table: data.table  } });
+               // Копируем исходный объект даты
+              const startDate = new Date(data.date);
+              const endDate = new Date(data.date);
+              startDate.setHours(0, 0, 0, 0);
+              endDate.setHours(23, 59, 59, 999);
+
+              let  existingBooking  = await Booking.findOne({ 
+                where: { 
+                  club_id: clubId, 
+                  time: data.time, 
+                  table: data.table,
+                  booking_date: {[Op.between]: [startDate, endDate]   }, 
+                } 
+              });
               console.log(existingBooking)
             } catch (error) {
               console.error(error);
