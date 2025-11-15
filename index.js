@@ -573,10 +573,11 @@ bot.on('message', async (msg) => {
               startDate.setHours(0, 0, 0, 0);
               endDate.setHours(23, 59, 59, 999);
 
-              let getBookingTime = (time, subtracter) => {
-                let [hours, minutes, seconds] = time.split(':');
-                hours = parseInt(hours) + subtracter;
-                return newTime = `${hours}:00:00`;
+              let getBookingTime = (time, offsetHours) => {
+                const [h] = time.split(":").map(Number);
+                const date = new Date();
+                date.setHours(h + offsetHours, 0, 0);
+                return String(date.getHours()).padStart(2, "0") + ":00:00";
               }
 
               console.log(`clubId=${clubId}, time=${data.time}, table=${data.table}, startDate=${startDate}, endDate=${endDate}`)
@@ -599,6 +600,7 @@ bot.on('message', async (msg) => {
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
+              console.log(existingBookingPreviousHour)
 
               let existingBookingNextHour = null
               if (data.hours == 2) {
@@ -611,6 +613,7 @@ bot.on('message', async (msg) => {
                   } 
                 });
               }
+              console.log(existingBookingPreviousHour)
 
               if (existingBooking || existingBookingPreviousHour || existingBookingNextHour) {
                 await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {
