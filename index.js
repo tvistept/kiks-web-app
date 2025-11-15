@@ -232,7 +232,6 @@ async function getSheetLink(sheetName, spreadsheetId) {
 
 async function unmergeCells(sheets, range, spreadsheetId) {
   const { sheetName, cellIndex1, cellIndex2, row } = getRangeObject(range);
-  console.log(range)
 
   // Получаем sheetId по имени листа
   const sheetRes = await sheets.spreadsheets.get({ spreadsheetId });
@@ -580,6 +579,7 @@ bot.on('message', async (msg) => {
                 return newTime = `${hours}:00:00`;
               }
 
+              console.log(`clubId=${clubId}, time=${data.time}, table=${data.table}, startDate=${startDate}, endDate=${endDate}`)
               let  existingBooking  = await Booking.findOne({ 
                 where: { 
                   club_id: clubId, 
@@ -588,6 +588,7 @@ bot.on('message', async (msg) => {
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
+              console.log(existingBooking)
 
               let existingBookingPreviousHour = await Booking.findOne({ 
                 where: { 
