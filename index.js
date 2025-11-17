@@ -418,11 +418,12 @@ async function deleteUserBookingRow(bookingId) {
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
+    console.log(msg.chat)
 
     if (text === '/start') {
         const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
         if (!userToReturn?.chat_id) {
-            await User.create({ chat_id: chatId, firstName: msg.chat.username });
+            await User.create({ chat_id: chatId, firstName: msg.chat.username||chatId });
             userName = null
         } else {
             userName = userToReturn.firstName
