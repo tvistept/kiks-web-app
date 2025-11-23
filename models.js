@@ -21,6 +21,10 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     unique: true,
   },
+  user_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 }, {
   // Дополнительные настройки модели
   tableName: 'users', // Название таблицы в базе данных

@@ -422,7 +422,7 @@ bot.on('message', async (msg) => {
     if (text === '/start') {
         const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
         if (!userToReturn?.chat_id) {
-            await User.create({ chat_id: chatId, firstName: msg.chat.first_name||msg.chat.username||chatId });
+            await User.create({ chat_id: chatId, firstName: msg.chat.first_name||msg.chat.username||chatId, user_name: msg.chat.username });
             userName = null
         } else {
             userName = userToReturn.firstName
@@ -660,7 +660,7 @@ bot.on('message', async (msg) => {
             await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
 
             let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
-            let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time,null, clubId, null]];
+            let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time, data.phone, clubId, null]];
             await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
 
         } catch (error) {
