@@ -633,36 +633,93 @@ bot.on('message', async (msg) => {
               console.error(error);
             }
             
-            await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
-            await User.update(
-                { firstName:  data.name, phone: data.phone }, // Новые значения для обновления
-                {
-                    where: {
-                        chat_id: chatId, // Условие: chat_id = chatId
-                    },
-                }
-            )
+            // await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
+            // await User.update(
+            //     { firstName:  data.name, phone: data.phone }, // Новые значения для обновления
+            //     {
+            //         where: {
+            //             chat_id: chatId, // Условие: chat_id = chatId
+            //         },
+            //     }
+            // )
 
-            let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-            let sheetLink = await getSheetLink(formattedDate, spreadsheetId)
-            const BUTTONS_BOOK_READY = {
-              "inline_keyboard": [
-                [
-                  {text: 'проверить бронь', url:sheetLink},
-                ],
-                [
-                  {text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}`},
-                ],
-              ]
-            }
+            // let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+            // let sheetLink = await getSheetLink(formattedDate, spreadsheetId)
+            // const BUTTONS_BOOK_READY = {
+            //   "inline_keyboard": [
+            //     [
+            //       {text: 'проверить бронь', url:sheetLink},
+            //     ],
+            //     [
+            //       {text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}`},
+            //     ],
+            //   ]
+            // }
             
-            await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, reply_markup: BUTTONS_BOOK_READY});
-            await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+            // await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, reply_markup: BUTTONS_BOOK_READY});
+            // await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+            try {
+              const booking = await Booking.create({
+                  chat_id: chatId,
+                  user_name: data.name,
+                  booking_date: data.date,
+                  time: data.time,
+                  hours: data.hours,
+                  table: data.table,
+                  dt_in: new Date().toLocaleString('ru-RU'),
+                  club_id: clubId
+              });
 
-            let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
-            let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time, data.phone, clubId, null]];
-            await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
+              // Если booking не создан – прервать выполнение
+              if (!booking) {
+                  throw new Error('Не удалось создать бронь');
+              }
 
+              await User.update(
+                  { firstName: data.name, phone: data.phone },
+                  { where: { chat_id: chatId } }
+              );
+
+              const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+              const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
+
+              const BUTTONS_BOOK_READY = {
+                  inline_keyboard: [
+                      [{ text: 'проверить бронь', url: sheetLink }],
+                      [{ text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}` }]
+                  ]
+              };
+
+              await bot.sendMessage(chatId, finalMessage, {
+                  parse_mode: 'HTML',
+                  disable_web_page_preview: true,
+                  link_preview_options: { is_disabled: true },
+                  reply_markup: BUTTONS_BOOK_READY
+              });
+
+              await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+              let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
+              let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time, data.phone, clubId, null]];
+              await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
+            } catch (err) {
+                console.error('Ошибка при создании бронирования:', err);
+                await bot.sendMessage(chatId, '⚠️ Произошла ошибка при создании брони. Попробуй ещё раз.', {
+                  parse_mode: 'HTML', 
+                  no_webpage:true, 
+                  disable_web_page_preview:true, 
+                  link_preview_options: {is_disabled: true},
+                  reply_markup: {
+                    keyboard: [
+                        [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                    ],
+                    "resize_keyboard": true,
+                    "one_time_keyboard": false,
+                    "selective": false,
+                    "is_persistent": true,
+                  }
+                });
+                return;
+            }
         } catch (error) {
             console.error(error);
         }
