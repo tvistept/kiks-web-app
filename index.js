@@ -200,28 +200,35 @@ async function mergeCells(sheets, range, spreadsheetId) {
 async function writeToRange(spreadsheetId, range, value, unmerge = false) {
   try {
     const values = [value];
-    const response = await sheetsClient.spreadsheets.values.update({
-      spreadsheetId,
-      range,
-      valueInputOption: 'USER_ENTERED',
-      resource: { values },
-    });
-
-    console.log(`${response.data.updatedCells} ячеек обновлено.`);
 
     if (unmerge) {
+      const response = await sheetsClient.spreadsheets.values.update({
+        spreadsheetId,
+        range,
+        valueInputOption: 'USER_ENTERED',
+        resource: { values },
+      });
+      console.log(`${response.data.updatedCells} ячеек обновлено.`);
+
       await unmergeCells(sheetsClient, range, spreadsheetId);
     } else {
       await mergeCells(sheetsClient, range, spreadsheetId);
-    }
 
+      const response = await sheetsClient.spreadsheets.values.update({
+        spreadsheetId,
+        range,
+        valueInputOption: 'USER_ENTERED',
+        resource: { values },
+      });
+      console.log(`${response.data.updatedCells} ячеек обновлено.`);
+    }
+    
     return true;
   } catch (error) {
     console.error('Ошибка в writeToRange:', error);
     throw error;
   }
 }
-
 
 async function getSheetLink(sheetName, spreadsheetId) {
 //   const spreadsheetId = USER_SHEET_ID;
@@ -293,7 +300,6 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
     throw error;
   }
 }
-
 
 async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) { 
     try {
