@@ -198,22 +198,30 @@ async function mergeCells(sheets, range, spreadsheetId) {
 }
 
 async function writeToRange(spreadsheetId, range, value, unmerge = false) {
-  const values = [ value ];
-  const resource = { values };
-  const response = await sheetsClient.spreadsheets.values.update({
-    spreadsheetId,
-    range,
-    valueInputOption: 'USER_ENTERED', // или 'RAW'
-    resource,
-  });
+  try {
+    const values = [value];
+    const response = await sheetsClient.spreadsheets.values.update({
+      spreadsheetId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      resource: { values },
+    });
 
-  console.log(`${response.data.updatedCells} ячеек обновлено.`);
-  if (unmerge) {
-    unmergeCells(sheetsClient, range, spreadsheetId);
-  } else {
-    mergeCells(sheetsClient, range, spreadsheetId);
+    console.log(`${response.data.updatedCells} ячеек обновлено.`);
+
+    if (unmerge) {
+      await unmergeCells(sheetsClient, range, spreadsheetId);
+    } else {
+      await mergeCells(sheetsClient, range, spreadsheetId);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Ошибка в writeToRange:', error);
+    throw error;
   }
 }
+
 
 async function getSheetLink(sheetName, spreadsheetId) {
 //   const spreadsheetId = USER_SHEET_ID;
@@ -263,56 +271,29 @@ async function unmergeCells(sheets, range, spreadsheetId) {
 }
 
 async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) { 
-    try {
-      // Определяем колонку для времени
-      let timeToColumn = {}
-      isWeekend(dateFromString(bookDate)) ? timeToColumn = {
-          '12:00': 'C',
-          '13:00': 'D',
-          '14:00': 'E',
-          '15:00': 'F',
-          '16:00': 'G',
-          '17:00': 'H',
-          '18:00': 'I',
-          '19:00': 'J',
-          '20:00': 'K',
-          '21:00': 'L',
-          '22:00': 'M',
-          '23:00': 'N',
-          '00:00': 'O',
-          '01:00': 'P',
-      } : timeToColumn = {
-          '14:00': 'C',
-          '15:00': 'D',
-          '16:00': 'E',
-          '17:00': 'F',
-          '18:00': 'G',
-          '19:00': 'H',
-          '20:00': 'I',
-          '21:00': 'J',
-          '22:00': 'K',
-          '23:00': 'L',
-          '00:00': 'M',
-          '01:00': 'N'
-      };
-      
-      let sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-      const startColumn = timeToColumn[bookTime];
-      const startRow = parseInt(tableNum) + 1
+  try {
+    const timeToColumn = isWeekend(dateFromString(bookDate))
+      ? { '12:00': 'C', '13:00': 'D', '14:00': 'E', '15:00': 'F', '16:00': 'G', '17:00': 'H', '18:00': 'I', '19:00': 'J', '20:00': 'K', '21:00': 'L', '22:00': 'M', '23:00': 'N', '00:00': 'O', '01:00': 'P' }
+      : { '14:00': 'C', '15:00': 'D', '16:00': 'E', '17:00': 'F', '18:00': 'G', '19:00': 'H', '20:00': 'I', '21:00': 'J', '22:00': 'K', '23:00': 'L', '00:00': 'M', '01:00': 'N' };
 
-      if (parseInt(hours) === 2) {
-          const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
-          await writeToRange(sheet_id, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, [userName, userName]);
-      } else {
-        await writeToCell(sheet_id, `${bookDate}!${startColumn}${startRow}`, userName);
-      }
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
+    const sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+    const startColumn = timeToColumn[bookTime];
+    const startRow = parseInt(tableNum) + 1;
+
+    if (parseInt(hours) === 2) {
+      const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
+      await writeToRange(sheet_id, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, [userName, userName]);
+    } else {
+      await writeToCell(sheet_id, `${bookDate}!${startColumn}${startRow}`, userName);
     }
-    
+    return true;
+
+  } catch (error) {
+    console.error('Ошибка в bookTable:', error);
+    throw error;
+  }
 }
+
 
 async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) { 
     try {
@@ -631,71 +612,6 @@ bot.on('message', async (msg) => {
             }
 
             //механизм бронирования
-            // try {
-            //   const booking = await Booking.create({
-            //       chat_id: chatId,
-            //       user_name: data.name,
-            //       booking_date: data.date,
-            //       time: data.time,
-            //       hours: data.hours,
-            //       table: data.table,
-            //       dt_in: new Date().toLocaleString('ru-RU'),
-            //       club_id: clubId
-            //   });
-
-            //   // Если booking не создан – прервать выполнение
-            //   if (!booking) {
-            //       throw new Error('Не удалось создать бронь в базе данных');
-            //   }
-
-            //   await User.update(
-            //       { firstName: data.name, phone: data.phone },
-            //       { where: { chat_id: chatId } }
-            //   );
-
-            //   const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-            //   const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
-
-            //   const BUTTONS_BOOK_READY = {
-            //       inline_keyboard: [
-            //           [{ text: 'проверить бронь', url: sheetLink }],
-            //           [{ text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}` }]
-            //       ]
-            //   };
-
-            //   await bot.sendMessage(chatId, finalMessage, {
-            //       parse_mode: 'HTML',
-            //       disable_web_page_preview: true,
-            //       link_preview_options: { is_disabled: true },
-            //       reply_markup: BUTTONS_BOOK_READY
-            //   });
-
-            //   await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
-            //   let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
-            //   let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time, data.phone, clubId, null]];
-            //   await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
-            // } catch (err) {
-            //     console.error('Ошибка при создании бронирования:', err);
-            //     await bot.sendMessage(chatId, '⚠️ Произошла ошибка при создании брони. Попробуй ещё раз.', {
-            //       parse_mode: 'HTML', 
-            //       no_webpage:true, 
-            //       disable_web_page_preview:true, 
-            //       link_preview_options: {is_disabled: true},
-            //       reply_markup: {
-            //         keyboard: [
-            //             [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
-            //         ],
-            //         "resize_keyboard": true,
-            //         "one_time_keyboard": false,
-            //         "selective": false,
-            //         "is_persistent": true,
-            //       }
-            //     });
-            //     let errorValues = [[chatId, err]];
-            //     await appendRow(SERVICE_SHEET_ID, 'errors_log', errorValues);
-            //     return;
-            // }
-
             let createdBooking = null;
             try {
                 // 1. Создаём бронь
@@ -719,16 +635,18 @@ bot.on('message', async (msg) => {
                 );
 
                 // 3. Пишем бронь в таблицу клуба
-                const writeSheetResult = await bookTable(
-                    formattedDate,
-                    data.time,
-                    data.table,
-                    data.hours,
-                    data.name,
-                    clubId
-                );
-
-                if (!writeSheetResult) throw new Error('Ошибка при записи в таблицу слотов');
+                try {
+                  await bookTable(
+                      formattedDate,
+                      data.time,
+                      data.table,
+                      data.hours,
+                      data.name,
+                      clubId
+                  );
+                } catch (err) {
+                  throw new Error('Ошибка при записи в таблицу слотов');
+                }
 
                 // 4. Всё прошло успешно → отправляем сообщение
                 const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
@@ -760,7 +678,6 @@ bot.on('message', async (msg) => {
 
             } catch (err) {
                 console.error('Ошибка при бронировании:', err);
-
                 // если бронь была создана → удаляем
                 if (createdBooking) {
                     try {
