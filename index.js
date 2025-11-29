@@ -564,8 +564,9 @@ bot.on('message', async (msg) => {
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
             let infoMessage1 = `У нас есть кухня (до 23:00) и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
-            let finalMessage = `${data.name}, это успех! Можешь проверить бронь командой /my_bookings.${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
+            let finalMessage = `${data.name}, это успех!${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
 
+            //проверка на существование конфликта в базе данных
             try {
                // Копируем исходный объект даты
               const startDate = new Date(data.date);
@@ -580,7 +581,6 @@ bot.on('message', async (msg) => {
                 return String(date.getHours()).padStart(2, "0") + ":00:00";
               }
 
-              console.log(`clubId=${clubId}, time=${data.time}, table=${data.table}, startDate=${startDate}, endDate=${endDate}`)
               let  existingBooking  = await Booking.findOne({ 
                 where: { 
                   club_id: clubId, 
@@ -589,7 +589,6 @@ bot.on('message', async (msg) => {
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
-              console.log(existingBooking)
 
               let existingBookingPreviousHour = await Booking.findOne({ 
                 where: { 
@@ -600,7 +599,6 @@ bot.on('message', async (msg) => {
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
-              console.log(existingBookingPreviousHour)
 
               let existingBookingNextHour = null
               if (data.hours == 2) {
@@ -613,7 +611,6 @@ bot.on('message', async (msg) => {
                   } 
                 });
               }
-              console.log(existingBookingPreviousHour)
 
               if (existingBooking || existingBookingPreviousHour || existingBookingNextHour) {
                 await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {
@@ -632,94 +629,176 @@ bot.on('message', async (msg) => {
             } catch (error) {
               console.error(error);
             }
-            
-            // await Booking.create({chat_id: chatId, user_name: data.name, booking_date: data.date, time: data.time, hours: data.hours, table: data.table, dt_in: new Date().toLocaleString('ru-RU'), club_id: clubId});
-            // await User.update(
-            //     { firstName:  data.name, phone: data.phone }, // Новые значения для обновления
-            //     {
-            //         where: {
-            //             chat_id: chatId, // Условие: chat_id = chatId
-            //         },
-            //     }
-            // )
 
-            // let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-            // let sheetLink = await getSheetLink(formattedDate, spreadsheetId)
-            // const BUTTONS_BOOK_READY = {
-            //   "inline_keyboard": [
-            //     [
-            //       {text: 'проверить бронь', url:sheetLink},
-            //     ],
-            //     [
-            //       {text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}`},
-            //     ],
-            //   ]
+            //механизм бронирования
+            // try {
+            //   const booking = await Booking.create({
+            //       chat_id: chatId,
+            //       user_name: data.name,
+            //       booking_date: data.date,
+            //       time: data.time,
+            //       hours: data.hours,
+            //       table: data.table,
+            //       dt_in: new Date().toLocaleString('ru-RU'),
+            //       club_id: clubId
+            //   });
+
+            //   // Если booking не создан – прервать выполнение
+            //   if (!booking) {
+            //       throw new Error('Не удалось создать бронь в базе данных');
+            //   }
+
+            //   await User.update(
+            //       { firstName: data.name, phone: data.phone },
+            //       { where: { chat_id: chatId } }
+            //   );
+
+            //   const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+            //   const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
+
+            //   const BUTTONS_BOOK_READY = {
+            //       inline_keyboard: [
+            //           [{ text: 'проверить бронь', url: sheetLink }],
+            //           [{ text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}` }]
+            //       ]
+            //   };
+
+            //   await bot.sendMessage(chatId, finalMessage, {
+            //       parse_mode: 'HTML',
+            //       disable_web_page_preview: true,
+            //       link_preview_options: { is_disabled: true },
+            //       reply_markup: BUTTONS_BOOK_READY
+            //   });
+
+            //   await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+            //   let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
+            //   let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time, data.phone, clubId, null]];
+            //   await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
+            // } catch (err) {
+            //     console.error('Ошибка при создании бронирования:', err);
+            //     await bot.sendMessage(chatId, '⚠️ Произошла ошибка при создании брони. Попробуй ещё раз.', {
+            //       parse_mode: 'HTML', 
+            //       no_webpage:true, 
+            //       disable_web_page_preview:true, 
+            //       link_preview_options: {is_disabled: true},
+            //       reply_markup: {
+            //         keyboard: [
+            //             [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+            //         ],
+            //         "resize_keyboard": true,
+            //         "one_time_keyboard": false,
+            //         "selective": false,
+            //         "is_persistent": true,
+            //       }
+            //     });
+            //     let errorValues = [[chatId, err]];
+            //     await appendRow(SERVICE_SHEET_ID, 'errors_log', errorValues);
+            //     return;
             // }
-            
-            // await bot.sendMessage(chatId, finalMessage, {parse_mode: 'HTML', no_webpage:true, disable_web_page_preview:true, link_preview_options: {is_disabled: true}, reply_markup: BUTTONS_BOOK_READY});
-            // await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
+
+            let createdBooking = null;
             try {
-              const booking = await Booking.create({
-                  chat_id: chatId,
-                  user_name: data.name,
-                  booking_date: data.date,
-                  time: data.time,
-                  hours: data.hours,
-                  table: data.table,
-                  dt_in: new Date().toLocaleString('ru-RU'),
-                  club_id: clubId
-              });
-
-              // Если booking не создан – прервать выполнение
-              if (!booking) {
-                  throw new Error('Не удалось создать бронь');
-              }
-
-              await User.update(
-                  { firstName: data.name, phone: data.phone },
-                  { where: { chat_id: chatId } }
-              );
-
-              const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
-              const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
-
-              const BUTTONS_BOOK_READY = {
-                  inline_keyboard: [
-                      [{ text: 'проверить бронь', url: sheetLink }],
-                      [{ text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}` }]
-                  ]
-              };
-
-              await bot.sendMessage(chatId, finalMessage, {
-                  parse_mode: 'HTML',
-                  disable_web_page_preview: true,
-                  link_preview_options: { is_disabled: true },
-                  reply_markup: BUTTONS_BOOK_READY
-              });
-
-              await bookTable(formattedDate, data.time, data.table, data.hours, data.name, clubId);
-              let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table)
-              let bookingValues = [[chatId, data.name, data.name, formattedDate, data.hours, bookingId, data.time, data.phone, clubId, null]];
-              await appendRow(SERVICE_SHEET_ID, 'userBooking', bookingValues);
-            } catch (err) {
-                console.error('Ошибка при создании бронирования:', err);
-                await bot.sendMessage(chatId, '⚠️ Произошла ошибка при создании брони. Попробуй ещё раз.', {
-                  parse_mode: 'HTML', 
-                  no_webpage:true, 
-                  disable_web_page_preview:true, 
-                  link_preview_options: {is_disabled: true},
-                  reply_markup: {
-                    keyboard: [
-                        [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
-                    ],
-                    "resize_keyboard": true,
-                    "one_time_keyboard": false,
-                    "selective": false,
-                    "is_persistent": true,
-                  }
+                // 1. Создаём бронь
+                createdBooking = await Booking.create({
+                    chat_id: chatId,
+                    user_name: data.name,
+                    booking_date: data.date,
+                    time: data.time,
+                    hours: data.hours,
+                    table: data.table,
+                    dt_in: new Date().toLocaleString('ru-RU'),
+                    club_id: clubId
                 });
+
+                if (!createdBooking) throw new Error('Не удалось записать бронь в базу данных');
+
+                // 2. Обновляем пользователя
+                await User.update(
+                    { firstName: data.name, phone: data.phone },
+                    { where: { chat_id: chatId } }
+                );
+
+                // 3. Пишем бронь в таблицу клуба
+                const writeSheetResult = await bookTable(
+                    formattedDate,
+                    data.time,
+                    data.table,
+                    data.hours,
+                    data.name,
+                    clubId
+                );
+
+                if (!writeSheetResult) throw new Error('Ошибка при записи в таблицу слотов');
+
+                // 4. Всё прошло успешно → отправляем сообщение
+                const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+                const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
+
+                const BUTTONS_BOOK_READY = {
+                    inline_keyboard: [
+                        [{ text: 'проверить бронь', url: sheetLink }],
+                        [{ text: 'отменить бронь', callback_data: `deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}` }]
+                    ]
+                };
+
+                await bot.sendMessage(chatId, finalMessage, {
+                    parse_mode: 'HTML',
+                    disable_web_page_preview: true,
+                    reply_markup: BUTTONS_BOOK_READY
+                });
+
+                // 5. Дополнительный лог (не критично)
+                try {
+                    let bookingId = generateBookingId(chatId, formattedDate, data.time, data.table);
+                    await appendRow(SERVICE_SHEET_ID, 'userBooking', [[
+                        chatId, data.name, data.name, formattedDate, data.hours,
+                        bookingId, data.time, data.phone, clubId, null
+                    ]]);
+                } catch (err) {
+                    console.error('appendRow не выполнен:', err);
+                }
+
+            } catch (err) {
+                console.error('Ошибка при бронировании:', err);
+
+                // если бронь была создана → удаляем
+                if (createdBooking) {
+                    try {
+                        await Booking.destroy({ where: { booking_id: createdBooking.booking_id } });
+                        console.log('Бронь откатилась вручную');
+                    } catch (deleteErr) {
+                        console.error('Не удалось удалить бронь вручную:', deleteErr);
+                    }
+                }
+
+                // Сообщение пользователю
+                await bot.sendMessage(chatId, '⚠️ Произошла ошибка при создании брони. Попробуй ещё раз или обратись к администратору клуба (@kiks_book или @kiksPetra).',
+                    {
+                      parse_mode: 'HTML', 
+                      no_webpage:true, 
+                      disable_web_page_preview:true, 
+                      link_preview_options: {is_disabled: true},
+                      reply_markup: {
+                        keyboard: [
+                            [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                        ],
+                        "resize_keyboard": true,
+                        "one_time_keyboard": false,
+                        "selective": false,
+                        "is_persistent": true,
+                      }
+                    });
+
+                // Лог ошибки
+                try {
+                    await appendRow(SERVICE_SHEET_ID, 'errors_log', [[chatId, String(err.message || err)]]);
+                } catch (logErr) {
+                    console.error('Ошибка при логировании:', logErr);
+                }
                 return;
             }
+
+
         } catch (error) {
             console.error(error);
         }
