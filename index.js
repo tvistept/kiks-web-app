@@ -760,14 +760,21 @@ bot.on('callback_query', async (callbackQuery) => {
 
       await booking.destroy();
 
-
       let bookingId = generateBookingId(chat_id, bookDate, bookTime, tableNum)
       deleteUserBookingRow(bookingId)
       deleteBooking(bookDate, bookTime, tableNum, parseFloat(bookHours), clubId)
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
   } catch (error) {
-    console.error('Callback error:', error);
+    let errorDedails = `chat_id: ${chat_id}, startDate: ${startDate}, endDate: ${endDate}, bookTime: ${bookTime}, tableNum: ${tableNum}, bookHours: ${bookHours}, clubId: ${clubId}`
+    console.error('Callback error:', `Ошибка удаления брони: ${errorDedails} (${error})`);
+
+    try {
+        await appendRow(SERVICE_SHEET_ID, 'errors_log', [[chat_id, `Ошибка при удалении брони: ${errorDedails}`]]);
+    } catch (logErr) {
+        console.error('Ошибка при логировании:', logErr);
+    }
+
     try {
       await bot.answerCallbackQuery(callbackQuery.id, {
         text: 'Произошла ошибка, попробуйте позже',
