@@ -547,9 +547,11 @@ bot.on('message', async (msg) => {
 
 
             let kiksManager = clubId === 'kiks2' ? `<a href="https://t.me/KiksPetra">Киксу</a>` : '<a href="https://t.me/kiks_book">Киксу</a>'
+            let kiksKitchen = clubId === 'kiks2' ? `` : '(до 23:00) '
 
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
-            let infoMessage1 = `У нас есть кухня (до 23:00) и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
+
+            let infoMessage1 = `У нас есть кухня ${kiksKitchen}и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех!${infoMessage}\n\n${infoMessage1}\n\n${infoMessage2}`
 
