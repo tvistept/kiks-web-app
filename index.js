@@ -406,8 +406,15 @@ bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
 
+    const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
+
+    if (userToReturn?.blocked_status == 1) {
+        await bot.sendMessage(chatId, 'Упс, что-то пошло не так. Попробуй позже.')
+        //Ты заблокирован и не можешь выполнять действия в боте.
+        return;
+    }
+
     if (text === '/start') {
-        const userToReturn  = await User.findOne({ where: { chat_id: chatId } }); 
         if (!userToReturn?.chat_id) {
             await User.create({ chat_id: chatId, firstName: msg.chat.first_name||msg.chat.username||chatId, user_name: msg.chat.username });
             userName = null
@@ -544,7 +551,6 @@ bot.on('message', async (msg) => {
             } else {
                 tableName = `стол № ${data.table}`
             }
-
 
             let kiksManager = clubId === 'kiks2' ? `<a href="https://t.me/KiksPetra">Киксу</a>` : '<a href="https://t.me/kiks_book">Киксу</a>'
             let kiksKitchen = clubId === 'kiks2' ? `` : '(до 23:00) '

@@ -25,6 +25,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  blocked_status: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 }, {
   // Дополнительные настройки модели
   tableName: 'users', // Название таблицы в базе данных
