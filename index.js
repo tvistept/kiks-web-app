@@ -28,7 +28,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors({
-  origin: ['https://kiks-app.ru', 'https://tvistept.github.io/kiks-test-react-app/', 'https://tvistept.github.io'],
+  origin: ['https://kiks-app.ru', 'https://tvistept.github.io/kiks-test-react-app/', 'https://tvistept.github.io/kiks-admin-panel/', 'https://tvistept.github.io'],
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 const http = require('http');
