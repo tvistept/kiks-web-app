@@ -108,14 +108,18 @@ router.get('/get-bookings-by-chat-id', async (req, res) => {
 router.get('/get-bookings-by-date', async (req, res) => {
   try {
     const { club_id, booking_date } = req.query;
+    let formatted_booking_date = getDateFromString(booking_date);
+    const startDate = new Date(formatted_booking_date);
+    const endDate = new Date(formatted_booking_date);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
     let bookings;
+
     if (club_id == 'all') {
       bookings = await Booking.findAll(
         {
           where: {
-            booking_date: {
-              [Op.gte]: today // Greater than or equal (>=) текущей даты
-            }, 
+            booking_date: {[Op.between]: [startDate, endDate]  }, 
           },
           order: [
             ['club_id', 'ASC'],
@@ -125,11 +129,6 @@ router.get('/get-bookings-by-date', async (req, res) => {
         } 
       );
     } else {
-      let booking_date = getDateFromString(booking_date);
-      const startDate = new Date(booking_date);
-      const endDate = new Date(booking_date);
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(23, 59, 59, 999);
       bookings = await Booking.findAll(
       {
         where: {
