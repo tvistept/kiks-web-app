@@ -76,7 +76,7 @@ const Booking = sequelize.define('Booking', {
   timestamps: true, // Добавляет поля createdAt и updatedAt
 });
 
-const Dayoffs = sequelize.define('Booking', {
+const Dayoffs = sequelize.define('Dayoffs', {
   // Определяем поля модели
   off_id: {
     type: DataTypes.INTEGER,
