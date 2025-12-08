@@ -7,6 +7,12 @@ const { User, Booking } = models;
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на начало дня (00:00:00)
 
+const getDateFromString = (dateString) => {
+  const [day, month, year] = dateString.split('.').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date;
+}
+
 // Получить все брони с текущей даты
 router.get('/bookings', async (req, res) => {
   try {
@@ -76,7 +82,6 @@ router.get('/get-user', async (req, res) => {
   }
 });
 
-
 //KIKS ADMIN API
 // Получить все брони с текущей даты по chat_id
 router.get('/get-bookings-by-chat-id', async (req, res) => {
@@ -90,8 +95,55 @@ router.get('/get-bookings-by-chat-id', async (req, res) => {
           }, 
           chat_id: chat_id
         },
+        order: [['booking_date', 'ASC']]
       } 
     );
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Получить все брони с по клубу и по дате
+router.get('/get-bookings-by-date', async (req, res) => {
+  try {
+    const { club_id, booking_date } = req.query;
+    let bookings;
+    if (club_id == 'all') {
+      bookings = await Booking.findAll(
+        {
+          where: {
+            booking_date: {
+              [Op.gte]: today // Greater than or equal (>=) текущей даты
+            }, 
+          },
+          order: [
+            ['club_id', 'ASC'],
+            ['time', 'ASC'],
+            ['table', 'ASC']
+          ]
+        } 
+      );
+    } else {
+      let booking_date = getDateFromString(booking_date);
+      const startDate = new Date(booking_date);
+      const endDate = new Date(booking_date);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      bookings = await Booking.findAll(
+      {
+        where: {
+          booking_date: {[Op.between]: [startDate, endDate]   }, 
+          club_id: club_id
+        },
+        order: [
+          ['time', 'ASC'],
+          ['table', 'ASC']
+        ]
+      } 
+    );
+    }
+    
     res.json(bookings);
   } catch (err) {
     res.status(500).json({ error: err.message });
