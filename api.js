@@ -170,7 +170,7 @@ router.get('/get-dayoffs', async (req, res) => {
 // Обновление blocked_status пользователя
 router.patch('/update-blocked-status', async (req, res) => {
   try {
-    const { chat_id, blocked_status } = req.body;
+    const { chat_id, blocked_status } = req.query;
     // Валидация обязательных полей
     if (!chat_id) {
       return res.status(400).json({ error: 'не указан chat_id' });
