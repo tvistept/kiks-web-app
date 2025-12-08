@@ -76,4 +76,26 @@ router.get('/get-user', async (req, res) => {
   }
 });
 
+
+//KIKS ADMIN API
+// Получить все брони с текущей даты по chat_id
+router.get('/get-bookings-by-chat-id', async (req, res) => {
+  try {
+    const { chat_id } = req.query;
+    const bookings = await Booking.findAll(
+      {
+        where: {
+          booking_date: {
+            [Op.gte]: today // Greater than or equal (>=) текущей даты
+          }, 
+          chat_id: chat_id
+        },
+      } 
+    );
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
