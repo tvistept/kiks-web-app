@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const models = require('./models');
 const { Op } = require('sequelize');
-const { User, Booking } = models;
+const { User, Booking, Dayoffs } = models;
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на начало дня (00:00:00)
 
@@ -144,6 +144,24 @@ router.get('/get-bookings-by-date', async (req, res) => {
     }
     
     res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Получить все нерабочие дни с текущей даты
+router.get('/get-dayoffs', async (req, res) => {
+  try {
+    const dayoffs = await Dayoffs.findAll(
+      {
+        where: {
+          off_date: {
+            [Op.gte]: today // Greater than or equal (>=) текущей даты
+          }
+        },
+      } 
+    );
+    res.json(dayoffs);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
