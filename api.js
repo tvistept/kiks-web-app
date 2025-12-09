@@ -167,6 +167,57 @@ router.get('/get-dayoffs', async (req, res) => {
   }
 });
 
+// Создание нерабочего дня
+router.post('/create-dayoff', async (req, res) => {
+  try {
+    const { club_id, off_date, off_reason } = req.body;
+
+    // 1. Валидация обязательных полей
+    if (!club_id || !off_date || !off_reason) {
+      return res.status(400).json({
+        error: 'Не указаны обязательные поля: клуб, дата, причина'
+      });
+    }
+
+    // 2. Проверка формата даты (опционально, но рекомендуется)
+    // const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    // if (!dateRegex.test(off_date)) {
+    //   return res.status(400).json({
+    //     error: 'off_date must be in YYYY-MM-DD format'
+    //   });
+    // }
+
+    // 3. Создание записи в БД
+    const newDayoff = await Dayoffs.create({
+      club_id,
+      off_date,
+      off_reason
+    });
+
+    // 4. Ответ с созданной записью
+    res.status(201).json({
+      message: 'Нерабочий день успешно создан',
+      data: newDayoff
+    });
+
+  } catch (err) {
+    console.error('Ошибка при создании нерабочего дня:', err);
+
+    // Обработка уникальных ошибок Sequelize
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: 'Validation error',
+        details: err.errors?.map(e => e.message)
+      });
+    }
+
+    res.status(500).json({
+      error: 'Ошибка при создании нерабочего дня',
+      details: err.message
+    });
+  }
+});
+
 // Обновление blocked_status пользователя
 router.patch('/update-blocked-status', async (req, res) => {
   try {
