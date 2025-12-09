@@ -179,14 +179,6 @@ router.post('/create-dayoff', async (req, res) => {
       });
     }
 
-    // 2. Проверка формата даты (опционально, но рекомендуется)
-    // const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    // if (!dateRegex.test(off_date)) {
-    //   return res.status(400).json({
-    //     error: 'off_date must be in YYYY-MM-DD format'
-    //   });
-    // }
-
     // 3. Создание записи в БД
     const newDayoff = await Dayoffs.create({
       club_id,
@@ -213,6 +205,53 @@ router.post('/create-dayoff', async (req, res) => {
 
     res.status(500).json({
       error: 'Ошибка при создании нерабочего дня',
+      details: err.message
+    });
+  }
+});
+
+// Маршрут: удаление дня отдыха по off_id
+router.delete('/delete-dayoff/:off_id', async (req, res) => {
+  try {
+    const { off_id } = req.params;
+
+    // 1. Валидация параметра
+    if (!off_id) {
+      return res.status(400).json({
+        error: 'off_id is required'
+      });
+    }
+
+    // 2. Проверка, что off_id — число
+    const offIdNum = parseInt(off_id, 10);
+    if (isNaN(offIdNum)) {
+      return res.status(400).json({
+        error: 'off_id must be a valid number'
+      });
+    }
+
+    // 3. Поиск записи
+    const dayoff = await Dayoffs.findOne({ where: { off_id: offIdNum } });
+
+    if (!dayoff) {
+      return res.status(404).json({
+        error: 'Dayoff not found'
+      });
+    }
+
+    // 4. Удаление записи
+    await dayoff.destroy();
+
+    res.json({
+      message: 'Dayoff deleted successfully',
+      deletedId: offIdNum
+    });
+
+  } catch (err) {
+    console.error('Error deleting dayoff:', err);
+
+    res.status(500).json({
+      error: 'Failed to delete dayoff',
       details: err.message
     });
   }
