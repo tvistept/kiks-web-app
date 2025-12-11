@@ -104,7 +104,7 @@ router.get('/get-bookings-by-chat-id', async (req, res) => {
   }
 });
 
-// Получить все брони с по клубу и по дате
+// Получить все брони по клубу и по дате
 router.get('/get-bookings-by-date', async (req, res) => {
   try {
     const { club_id, booking_date } = req.query;
@@ -146,6 +146,53 @@ router.get('/get-bookings-by-date', async (req, res) => {
     res.json(bookings);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Удаление брони по booking_id
+router.delete('/delete-booking/:booking_id', async (req, res) => {
+  try {
+    const { booking_id } = req.params;
+
+    // 1. Валидация параметра
+    if (!booking_id) {
+      return res.status(400).json({
+        error: 'не передан параметр booking_id'
+      });
+    }
+
+    // 2. Проверка, что booking_id — число
+    const bookingIdNum = parseInt(booking_id, 10);
+    if (isNaN(bookingIdNum)) {
+      return res.status(400).json({
+        error: 'параметр booking_id должен быть числом'
+      });
+    }
+
+    // 3. Поиск записи
+    const booking = await Booking.findOne({ where: { booking_id: bookingIdNum } });
+
+    if (!booking) {
+      return res.status(404).json({
+        error: 'Бронь не найдена'
+      });
+    }
+
+    // 4. Удаление записи
+    await booking.destroy();
+
+    res.json({
+      message: 'Бронь успешно удалена',
+      deletedId: bookingIdNum
+    });
+
+  } catch (err) {
+    console.error('Ошибка при удалении брони:', err);
+
+    res.status(500).json({
+      error: 'Не удалось удалить бронь',
+      details: err.message
+    });
   }
 });
 
