@@ -167,6 +167,33 @@ router.get('/get-dayoffs', async (req, res) => {
   }
 });
 
+// Получить все нерабочие дни с текущей даты
+router.get('/get-closed-slots', async (req, res) => {
+  try {
+    const closedSlots = await Booking.findAll({
+      where: {
+        chat_id: -2,
+        booking_date: {
+            [Op.gte]: today // Greater than or equal (>=) текущей даты
+          }, 
+      },
+      attributes: [
+        ['booking_id', 'id'],
+        ['user_name', 'signature'],
+        ['booking_date', 'date'],
+        ['time', 'time'],
+        ['hours', 'hours'],
+        ['table', 'table'],
+        ['club_id', 'club']
+      ],
+      order: [['booking_date', 'ASC']]
+    });
+    res.json(closedSlots);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Создание нерабочего дня
 router.post('/create-dayoff', async (req, res) => {
   try {

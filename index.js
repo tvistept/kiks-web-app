@@ -539,6 +539,7 @@ bot.on('message', async (msg) => {
         try {
             const data = JSON.parse(msg.web_app_data.data);
             let prefix = parseFloat(data?.hours) > 1 ? 'часа' : 'час';
+            let errMessage = ''
             const dateString = data.date;
             const [year, month, day] = dateString.split('-');
             const formattedDate = `${day}.${month}.${year}`;
@@ -659,6 +660,7 @@ bot.on('message', async (msg) => {
                       clubId
                   );
                 } catch (err) {
+                  errMessage = err.message
                   throw new Error('Ошибка при записи в таблицу слотов');
                 }
 
@@ -722,7 +724,7 @@ bot.on('message', async (msg) => {
 
                 // Лог ошибки
                 try {
-                    await appendRow(SERVICE_SHEET_ID, 'errors_log', [[chatId, String(err.message || err)]]);
+                    await appendRow(SERVICE_SHEET_ID, 'errors_log', [[chatId, String(err.message || err), new Date(), errMessage]]);
                 } catch (logErr) {
                     console.error('Ошибка при логировании:', logErr);
                 }
