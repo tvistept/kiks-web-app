@@ -331,6 +331,53 @@ router.delete('/delete-closed-slot/:booking_id', async (req, res) => {
   }
 });
 
+// Создание закрытого слота
+router.post('/create-closed-slot', async (req, res) => {
+  try {
+    const { club_id, booking_date, user_name, time, hours, table } = req.body;
+
+    // 1. Валидация обязательных полей
+    if (!club_id || !booking_date || !user_name || !time || !hours || !table) {
+      return res.status(400).json({
+        error: 'Не указаны обязательные поля: клуб, дата, причина, время, часы, стол'
+      });
+    }
+
+    // 3. Создание записи в БД
+    const newClosedSlot = await Booking.create({
+      chat_id: -2,
+      user_name,
+      booking_date,
+      time,
+      hours,
+      table,
+      club_id
+    });
+
+    // 4. Ответ с созданной записью
+    res.status(201).json({
+      message: 'Закрытый слот успешно создан',
+      data: newClosedSlot
+    });
+
+  } catch (err) {
+    console.error('Ошибка при создании закрытого слота:', err);
+
+    // Обработка уникальных ошибок Sequelize
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: 'Validation error',
+        details: err.errors?.map(e => e.message)
+      });
+    }
+
+    res.status(500).json({
+      error: 'Ошибка при создании закрытого слота',
+      details: err.message
+    });
+  }
+});
+
 // Обновление blocked_status пользователя
 router.patch('/update-blocked-status', async (req, res) => {
   try {
