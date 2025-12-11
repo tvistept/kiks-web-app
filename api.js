@@ -167,33 +167,6 @@ router.get('/get-dayoffs', async (req, res) => {
   }
 });
 
-// Получить все нерабочие дни с текущей даты
-router.get('/get-closed-slots', async (req, res) => {
-  try {
-    const closedSlots = await Booking.findAll({
-      where: {
-        chat_id: -2,
-        booking_date: {
-            [Op.gte]: today // Greater than or equal (>=) текущей даты
-          }, 
-      },
-      attributes: [
-        ['booking_id', 'id'],
-        ['user_name', 'signature'],
-        ['booking_date', 'date'],
-        ['time', 'time'],
-        ['hours', 'hours'],
-        ['table', 'table'],
-        ['club_id', 'club']
-      ],
-      order: [['booking_date', 'ASC']]
-    });
-    res.json(closedSlots);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
 // Создание нерабочего дня
 router.post('/create-dayoff', async (req, res) => {
   try {
@@ -279,6 +252,80 @@ router.delete('/delete-dayoff/:off_id', async (req, res) => {
 
     res.status(500).json({
       error: 'Failed to delete dayoff',
+      details: err.message
+    });
+  }
+});
+
+// Получить все закрытые слоты текущей даты
+router.get('/get-closed-slots', async (req, res) => {
+  try {
+    const closedSlots = await Booking.findAll({
+      where: {
+        chat_id: -2,
+        booking_date: {
+            [Op.gte]: today // Greater than or equal (>=) текущей даты
+          }, 
+      },
+      attributes: [
+        ['booking_id', 'id'],
+        ['user_name', 'signature'],
+        ['booking_date', 'date'],
+        ['time', 'time'],
+        ['hours', 'hours'],
+        ['table', 'table'],
+        ['club_id', 'club']
+      ],
+      order: [['booking_date', 'ASC']]
+    });
+    res.json(closedSlots);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Удаление закрытого слота по booking_id
+router.delete('/delete-closed-slot/:booking_id', async (req, res) => {
+  try {
+    const { booking_id } = req.params;
+
+    // 1. Валидация параметра
+    if (!booking_id) {
+      return res.status(400).json({
+        error: 'не передан параметр booking_id'
+      });
+    }
+
+    // 2. Проверка, что booking_id — число
+    const bookingIdNum = parseInt(booking_id, 10);
+    if (isNaN(bookingIdNum)) {
+      return res.status(400).json({
+        error: 'параметр booking_id должен быть числом'
+      });
+    }
+
+    // 3. Поиск записи
+    const closedSlot = await Booking.findOne({ where: { booking_id: bookingIdNum } });
+
+    if (!closedSlot) {
+      return res.status(404).json({
+        error: 'Закрытый слот не найден'
+      });
+    }
+
+    // 4. Удаление записи
+    await closedSlot.destroy();
+
+    res.json({
+      message: 'Закрытый слот успешно удален',
+      deletedId: bookingIdNum
+    });
+
+  } catch (err) {
+    console.error('Ошибка при удалении закрытого слота:', err);
+
+    res.status(500).json({
+      error: 'Не удалось удалить закрытый слот',
       details: err.message
     });
   }
