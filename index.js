@@ -94,6 +94,13 @@ function dateFromString(dateString) {
   return date;
 }
 
+let getBookingTime = (time, offsetHours) => {
+  const [h] = time.split(":").map(Number);
+  const date = new Date();
+  date.setHours(h + offsetHours, 0, 0);
+  return String(date.getHours()).padStart(2, "0") + ":00:00";
+}
+
 function isWeekend(date) {
     const day = date.getDay(); // 0 - воскресенье, 1 - понедельник, ..., 6 - суббота
     return day === 0 || day === 6; // 0 (воскресенье), 5 (пятница), 6 (суббота)
@@ -570,13 +577,6 @@ bot.on('message', async (msg) => {
               startDate.setHours(0, 0, 0, 0);
               endDate.setHours(23, 59, 59, 999);
 
-              let getBookingTime = (time, offsetHours) => {
-                const [h] = time.split(":").map(Number);
-                const date = new Date();
-                date.setHours(h + offsetHours, 0, 0);
-                return String(date.getHours()).padStart(2, "0") + ":00:00";
-              }
-
               let  existingBooking  = await Booking.findOne({ 
                 where: { 
                   club_id: clubId, 
@@ -610,6 +610,45 @@ bot.on('message', async (msg) => {
 
               if (existingBooking || existingBookingPreviousHour || existingBookingNextHour) {
                 await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {
+                    reply_markup: {
+                        keyboard: [
+                            [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
+                        ],
+                        "resize_keyboard": true,
+                        "selective": false,
+                        "one_time_keyboard": false,
+                        "is_persistent": true,
+                    }
+                });
+                return;
+              } 
+            } catch (error) {
+              console.error(error);
+            }
+
+            //проверка на существование брони в другом клубе
+            try {
+               // Копируем исходный объект даты
+              const startDate = new Date(data.date);
+              const endDate = new Date(data.date);
+              startDate.setHours(0, 0, 0, 0);
+              endDate.setHours(23, 59, 59, 999);
+
+              let otherClubId = clubId === 'kiks2' ? 'kiks1' : 'kiks2';
+              let clubName = clubId === 'kiks2' ? 'Каменноостровском' : 'Марата';
+              let anotherClubName = clubId === 'kiks2' ? 'Марата' : 'Каменноостровском';
+
+              let  anotherClubBooking  = await Booking.findOne({
+                where: { 
+                  chat_id: chatId,
+                  club_id: otherClubId, 
+                  time: {[Op.between]: [getBookingTime(data.time, -parseInt(data.hours)), getBookingTime(data.time, parseInt(data.hours))]},
+                  booking_date: {[Op.between]: [startDate, endDate]   }, 
+                } 
+              });
+
+              if (anotherClubBooking) {
+                await bot.sendMessage(chatId, `Ты не можешь забронировать стол на ${clubName}, так как у тебя уже есть бронь на ${anotherClubName} в ${data.time} в этот день. Выбери слот на другое время (на пару часов позднее или раньше).`,  {
                     reply_markup: {
                         keyboard: [
                             [{ text: 'Прикинуть кий к носу', web_app: { url: `${WEB_APP_URL}?user_id=${chatId}` } }],
