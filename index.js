@@ -102,8 +102,26 @@ let getBookingTime = (time, offsetHours) => {
 }
 
 function isWeekend(date) {
-    const day = date.getDay(); // 0 - воскресенье, 1 - понедельник, ..., 6 - суббота
-    return day === 0 || day === 6; // 0 (воскресенье), 5 (пятница), 6 (суббота)
+  const weekendDays = [
+    '02.01.2026',
+    '03.01.2026',
+    '04.01.2026',
+    '05.01.2026',
+    '06.01.2026',
+    '07.01.2026',
+    '08.01.2026',
+    '09.01.2026',
+    '10.01.2026',
+    '11.01.2026'
+  ];
+
+  const day = date.getDay();
+    if (day === 0 || day === 6) {
+        return true;
+    }
+
+  const dateString = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+  return weekendDays.includes(dateString);
 }
 
 function generateBookingId(chatId, bookDate, bookTime, tableNum) {
