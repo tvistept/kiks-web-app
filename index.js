@@ -364,8 +364,8 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
 
-      if (parseInt(hours) === 2) {
-          const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
+      if (parseInt(hours) > 1 ) {
+          const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + (parseInt(hours) - 1));
           await writeToRange(spreadsheetId, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, ['', ''], true);
       } else {
         await writeToCell(spreadsheetId, `${bookDate}!${startColumn}${startRow}`, '');
