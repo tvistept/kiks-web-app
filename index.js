@@ -312,8 +312,8 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
     const startColumn = timeToColumn[bookTime];
     const startRow = parseInt(tableNum) + 1;
 
-    if (parseInt(hours) === 2) {
-      const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + 1);
+    if (parseInt(hours) > 1) {
+      const nextColumn = String.fromCharCode(startColumn.charCodeAt(0) + (parseInt(hours) - 1));
       await writeToRange(sheet_id, `${bookDate}!${startColumn}${startRow}:${nextColumn}${startRow}`, [userName, userName]);
     } else {
       await writeToCell(sheet_id, `${bookDate}!${startColumn}${startRow}`, userName);
