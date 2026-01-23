@@ -390,22 +390,48 @@ router.post('/create-closed-slot', async (req, res) => {
       });
     }
 
-    // 3. Создание записи в БД
-    const newClosedSlot = await Booking.create({
-      chat_id: -2,
-      user_name,
-      booking_date,
-      time,
-      hours,
-      table,
-      club_id
-    });
+    if (table == -1) {
+      let tables
+      if (club_id == 'kiks1') {
+        tables = [3, 4, 5, 6];
+      } else {
+        tables = [3, 4, 6, 7, 8];
+      }
 
-    // 4. Ответ с созданной записью
-    res.status(201).json({
-      message: 'Закрытый слот успешно создан',
-      data: newClosedSlot
-    });
+      for (const table of tables) {
+        const newClosedSlot = await Booking.create({
+          chat_id: -2,
+          user_name,
+          booking_date,
+          time,
+          hours,
+          table,
+          club_id
+        });
+
+         res.status(201).json({
+          message: 'Закрытый слот успешно создан',
+          data: newClosedSlot
+        });
+      }
+    } else {
+      // 3. Создание записи в БД
+      const newClosedSlot = await Booking.create({
+        chat_id: -2,
+        user_name,
+        booking_date,
+        time,
+        hours,
+        table,
+        club_id
+      });
+
+      // 4. Ответ с созданной записью
+      res.status(201).json({
+        message: 'Закрытый слот успешно создан',
+        data: newClosedSlot
+      });
+    }
 
   } catch (err) {
     console.error('Ошибка при создании закрытого слота:', err);
