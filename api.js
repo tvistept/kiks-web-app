@@ -398,22 +398,38 @@ router.post('/create-closed-slot', async (req, res) => {
         tables = [3, 4, 6, 7, 8];
       }
 
-      for (const table of tables) {
-        const newClosedSlot = await Booking.create({
-          chat_id: -2,
-          user_name,
-          booking_date,
-          time,
-          hours,
-          table,
-          club_id
-        });
+      const newSlots = tables.map(table => ({
+        chat_id: -2,
+        user_name,
+        booking_date,
+        time,
+        hours,
+        table,
+        club_id
+      }));
 
-         res.status(201).json({
-          message: 'Закрытый слот успешно создан',
-          data: newClosedSlot
-        });
-      }
+      const newClosedSlots = await Booking.bulkCreate(newSlots);
+
+      res.status(201).json({
+        message: 'Закрытый слот успешно создан',
+        data: newClosedSlots[0]
+      });
+      // for (const table of tables) {
+      //   const newClosedSlot = await Booking.create({
+      //     chat_id: -2,
+      //     user_name,
+      //     booking_date,
+      //     time,
+      //     hours,
+      //     table,
+      //     club_id
+      //   });
+
+      //    res.status(201).json({
+      //     message: 'Закрытый слот успешно создан',
+      //     data: newClosedSlot
+      //   });
+      // }
     } else {
       // 3. Создание записи в БД
       const newClosedSlot = await Booking.create({
