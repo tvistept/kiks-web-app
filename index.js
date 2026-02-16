@@ -602,7 +602,14 @@ bot.on('message', async (msg) => {
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
-              console.log(existingBookings)
+
+              let formattedArray = existingBookings.map(booking => ({
+                booking_id: booking.booking_id,
+                booking_date: booking.booking_date,
+                time: booking.time,
+                hours: booking.hours
+              }));
+              console.log(formattedArray)
 
               let  existingBooking  = await Booking.findOne({ 
                 where: { 
