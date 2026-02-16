@@ -595,6 +595,15 @@ bot.on('message', async (msg) => {
               startDate.setHours(0, 0, 0, 0);
               endDate.setHours(23, 59, 59, 999);
 
+              let existingBookings  = await Booking.findAll({ 
+                where: { 
+                  club_id: clubId, 
+                  table: data.table,
+                  booking_date: {[Op.between]: [startDate, endDate]   }, 
+                } 
+              });
+              console.log(existingBookings)
+
               let  existingBooking  = await Booking.findOne({ 
                 where: { 
                   club_id: clubId, 
@@ -609,13 +618,16 @@ bot.on('message', async (msg) => {
                   club_id: clubId, 
                   time: getBookingTime(data.time, -1), 
                   table: data.table,
-                  hours: 2,
+                  hours: {
+                    [Op.gte]: 2 
+                  }, 
+                  // hours: 2,
                   booking_date: {[Op.between]: [startDate, endDate]   }, 
                 } 
               });
 
               let existingBookingNextHour = null
-              if (data.hours == 2) {
+              if (data.hours >= 2) {
                 existingBookingNextHour = await Booking.findOne({ 
                   where: { 
                     club_id: clubId, 
