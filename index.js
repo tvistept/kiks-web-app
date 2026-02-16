@@ -603,49 +603,98 @@ bot.on('message', async (msg) => {
                 } 
               });
 
-              let formattedArray = existingBookings.map(booking => ({
+              let formattedBookings = existingBookings.map(booking => ({
                 booking_id: booking.booking_id,
-                booking_date: booking.booking_date,
+                booking_date: new Date(booking.booking_date).toLocaleDateString('en-CA'),
                 time: booking.time,
                 hours: booking.hours
               }));
-              console.log(formattedArray)
+              console.log(formattedBookings)
+              // let bookings = arr.map(item => {
+              //   item.booking_date = new Date(item.booking_date).toLocaleDateString('en-CA');
+              //   return item
+              // })
+              // console.log(bookings)
 
-              let  existingBooking  = await Booking.findOne({ 
-                where: { 
-                  club_id: clubId, 
-                  time: data.time, 
-                  table: data.table,
-                  booking_date: {[Op.between]: [startDate, endDate]   }, 
-                } 
-              });
-
-              let existingBookingPreviousHour = await Booking.findOne({ 
-                where: { 
-                  club_id: clubId, 
-                  time: getBookingTime(data.time, -1), 
-                  table: data.table,
-                  hours: {
-                    [Op.gte]: 2 
-                  }, 
-                  // hours: 2,
-                  booking_date: {[Op.between]: [startDate, endDate]   }, 
-                } 
-              });
-
-              let existingBookingNextHour = null
-              if (data.hours >= 2) {
-                existingBookingNextHour = await Booking.findOne({ 
-                  where: { 
-                    club_id: clubId, 
-                    time: getBookingTime(data.time, 1), 
-                    table: data.table,
-                    booking_date: {[Op.between]: [startDate, endDate]   }, 
-                  } 
-                });
+              // Преобразует строку даты и времени в Date объект
+              function parseDateTime(dateStr, timeStr) {
+                  if (timeStr == '00:00:00' || timeStr == '01:00:00') {
+                    dateStr = new Date(new Date(dateStr).setDate(new Date(dateStr).getDate() + 1)).toLocaleDateString('en-CA');
+                  }
+                  return new Date(`${dateStr}T${timeStr}`);
               }
 
-              if (existingBooking || existingBookingPreviousHour || existingBookingNextHour) {
+              // Вычисляет конец бронирования (начало + hours)
+              function getEndTime(start, hours) {
+                  const end = new Date(start);
+                  end.setHours(end.getHours() + hours);
+                  return end;
+              }
+
+              // Проверяет пересечение двух интервалов
+              function isOverlap(start1, end1, start2, end2) {
+                  return start1 < end2 && start2 < end1;
+              }
+
+              function hasConflict(bookings, newBooking) {
+                  const newStart = parseDateTime(newBooking.booking_date, newBooking.time);
+                  const newEnd = getEndTime(newStart, newBooking.hours);
+
+                  for (const booking of bookings) {
+                      const existingStart = parseDateTime(booking.booking_date, booking.time);
+                      const existingEnd = getEndTime(existingStart, booking.hours);
+
+                      if (isOverlap(newStart, newEnd, existingStart, existingEnd)) {
+                          return true; // Найден конфликт
+                      }
+                  }
+
+                  return false; // Конфликтов нет
+              }
+
+              let newBooking = {
+                  booking_date: new Date(data.date).toLocaleDateString('en-CA'),
+                  time: data.time,
+                  hours: data.hours,
+              };
+
+              console.log(newBooking)
+
+              // let  existingBooking  = await Booking.findOne({ 
+              //   where: { 
+              //     club_id: clubId, 
+              //     time: data.time, 
+              //     table: data.table,
+              //     booking_date: {[Op.between]: [startDate, endDate]   }, 
+              //   } 
+              // });
+
+              // let existingBookingPreviousHour = await Booking.findOne({ 
+              //   where: { 
+              //     club_id: clubId, 
+              //     time: getBookingTime(data.time, -1), 
+              //     table: data.table,
+              //     hours: {
+              //       [Op.gte]: 2 
+              //     }, 
+              //     // hours: 2,
+              //     booking_date: {[Op.between]: [startDate, endDate]   }, 
+              //   } 
+              // });
+
+              // let existingBookingNextHour = null
+              // if (data.hours >= 2) {
+              //   existingBookingNextHour = await Booking.findOne({ 
+              //     where: { 
+              //       club_id: clubId, 
+              //       time: getBookingTime(data.time, 1), 
+              //       table: data.table,
+              //       booking_date: {[Op.between]: [startDate, endDate]   }, 
+              //     } 
+              //   });
+              // }
+
+              if (hasConflict(formattedBookings, newBooking)) {
                 await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {
                     reply_markup: {
                         keyboard: [
