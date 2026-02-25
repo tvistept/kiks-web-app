@@ -507,7 +507,7 @@ router.get('/get-weekends', async (req, res) => {
     const weekends = await Weekends.findAll(
       {
         where: {
-          weekends_date: {
+          weekend_date: {
             [Op.gte]: today // Greater than or equal (>=) текущей даты
           }
         },
