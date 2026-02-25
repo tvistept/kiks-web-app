@@ -519,4 +519,38 @@ router.get('/get-weekends', async (req, res) => {
   }
 });
 
+// Создание выходного дня
+router.post('/create-weekend', async (req, res) => {
+  try {
+    const { weekend_date } = req.body;
+
+    // 3. Создание записи в БД
+    const newWeekend = await Weekends.create({
+      weekend_date
+    });
+
+    // 4. Ответ с созданной записью
+    res.status(201).json({
+      message: 'Выходной день успешно создан',
+      data: newWeekend
+    });
+
+  } catch (err) {
+    console.error('Ошибка при создании выходного дня:', err);
+
+    // Обработка уникальных ошибок Sequelize
+    if (err.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        error: 'Validation error',
+        details: err.errors?.map(e => e.message)
+      });
+    }
+
+    res.status(500).json({
+      error: 'Ошибка при создании выходного дня',
+      details: err.message
+    });
+  }
+});
+
 module.exports = router;
