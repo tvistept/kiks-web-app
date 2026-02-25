@@ -114,7 +114,7 @@ const Weekends = sequelize.define('Weekends', {
   },
 }, {
   // Дополнительные настройки модели
-  tableName: 'dayoffs', // Название таблицы в базе данных
+  tableName: 'weekends', // Название таблицы в базе данных
   timestamps: false, // Добавляет поля createdAt и updatedAt
 });
 
