@@ -609,12 +609,6 @@ bot.on('message', async (msg) => {
                 time: booking.time,
                 hours: booking.hours
               }));
-              console.log(formattedBookings)
-              // let bookings = arr.map(item => {
-              //   item.booking_date = new Date(item.booking_date).toLocaleDateString('en-CA');
-              //   return item
-              // })
-              // console.log(bookings)
 
               // Преобразует строку даты и времени в Date объект
               function parseDateTime(dateStr, timeStr) {
@@ -648,7 +642,6 @@ bot.on('message', async (msg) => {
                           return true; // Найден конфликт
                       }
                   }
-
                   return false; // Конфликтов нет
               }
 
@@ -657,42 +650,6 @@ bot.on('message', async (msg) => {
                   time: data.time,
                   hours: data.hours,
               };
-
-              console.log(newBooking)
-
-              // let  existingBooking  = await Booking.findOne({ 
-              //   where: { 
-              //     club_id: clubId, 
-              //     time: data.time, 
-              //     table: data.table,
-              //     booking_date: {[Op.between]: [startDate, endDate]   }, 
-              //   } 
-              // });
-
-              // let existingBookingPreviousHour = await Booking.findOne({ 
-              //   where: { 
-              //     club_id: clubId, 
-              //     time: getBookingTime(data.time, -1), 
-              //     table: data.table,
-              //     hours: {
-              //       [Op.gte]: 2 
-              //     }, 
-              //     // hours: 2,
-              //     booking_date: {[Op.between]: [startDate, endDate]   }, 
-              //   } 
-              // });
-
-              // let existingBookingNextHour = null
-              // if (data.hours >= 2) {
-              //   existingBookingNextHour = await Booking.findOne({ 
-              //     where: { 
-              //       club_id: clubId, 
-              //       time: getBookingTime(data.time, 1), 
-              //       table: data.table,
-              //       booking_date: {[Op.between]: [startDate, endDate]   }, 
-              //     } 
-              //   });
-              // }
 
               if (hasConflict(formattedBookings, newBooking)) {
                 await bot.sendMessage(chatId, 'Извини, кто-то уже забронировал стол на это время. Попробуй другой слот.',  {

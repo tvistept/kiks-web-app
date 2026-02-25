@@ -101,4 +101,21 @@ const Dayoffs = sequelize.define('Dayoffs', {
   timestamps: false, // Добавляет поля createdAt и updatedAt
 });
 
-module.exports = {User, Booking, Dayoffs};
+const Weekends = sequelize.define('Weekends', {
+  // Определяем поля модели
+  weekend_id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  weekend_date: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+}, {
+  // Дополнительные настройки модели
+  tableName: 'dayoffs', // Название таблицы в базе данных
+  timestamps: false, // Добавляет поля createdAt и updatedAt
+});
+
+module.exports = {User, Booking, Dayoffs, Weekends};

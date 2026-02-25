@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const models = require('./models');
 const { Op } = require('sequelize');
-const { User, Booking, Dayoffs } = models;
+const { User, Booking, Dayoffs, Weekends } = models;
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на начало дня (00:00:00)
 
@@ -497,6 +497,24 @@ router.patch('/update-blocked-status', async (req, res) => {
 
   } catch (err) {
     // console.error('Ошибка при обновлении blocked_status:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Получить все дни по графику выходного с текущей даты
+router.get('/get-weekends', async (req, res) => {
+  try {
+    const weekends = await Weekends.findAll(
+      {
+        where: {
+          weekends_date: {
+            [Op.gte]: today // Greater than or equal (>=) текущей даты
+          }
+        },
+      } 
+    );
+    res.json(weekends);
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
