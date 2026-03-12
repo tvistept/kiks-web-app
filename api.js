@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const models = require('./models');
 const { Op, Sequelize } = require('sequelize');
+const sequelize = require('./db');
 const { User, Booking, Dayoffs, Weekends } = models;
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на начало дня (00:00:00)
@@ -556,7 +557,7 @@ router.post('/create-weekend', async (req, res) => {
 //аналитические данные
 router.get('/get-kiks-analytics', async (req, res) => {
   try {
-    const result = await Sequelize.query(
+    const result = await sequelize.query(
       `SELECT
         booking_date,
         SUM(kiks1_total_bookings) AS k1_tb,
