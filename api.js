@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const models = require('./models');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const { User, Booking, Dayoffs, Weekends } = models;
 const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на начало дня (00:00:00)
