@@ -556,7 +556,7 @@ router.post('/create-weekend', async (req, res) => {
 //аналитические данные
 router.get('/get-kiks-analytics', async (req, res) => {
   try {
-    const result = await sequelize.query(
+    const result = await Sequelize.query(
       `SELECT
         booking_date,
         SUM(kiks1_total_bookings) AS k1_tb,
