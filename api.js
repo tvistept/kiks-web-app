@@ -553,4 +553,37 @@ router.post('/create-weekend', async (req, res) => {
   }
 });
 
+//аналитические данные
+router.get('/get-kiks-analytics', async (req, res) => {
+  try {
+    const result = await sequelize.query(
+      `SELECT
+        booking_date,
+        SUM(kiks1_total_bookings) AS k1_tb,
+        SUM(kiks1_total_hours) AS k1_th,
+        SUM(kiks2_total_bookings) AS k2_tb,
+        SUM(kiks2_total_hours) AS k2_th
+      FROM (
+        SELECT
+          TO_CHAR(booking_date, 'dd-mm-yyyy') AS booking_date,
+          CASE WHEN club_id = 'kiks1' THEN COUNT(booking_id) ELSE NULL END AS kiks1_total_bookings,
+          CASE WHEN club_id = 'kiks1' THEN SUM(hours) ELSE NULL END AS kiks1_total_hours,
+          CASE WHEN club_id = 'kiks2' THEN COUNT(booking_id) ELSE NULL END AS kiks2_total_bookings,
+          CASE WHEN club_id = 'kiks2' THEN SUM(hours) ELSE NULL END AS kiks2_total_hours
+        FROM bookings
+        WHERE booking_date BETWEEN NOW() - INTERVAL '7d' AND NOW()
+        GROUP BY booking_date, club_id
+      ) AS foo
+      GROUP BY booking_date
+      ORDER BY booking_date;`,
+      {
+        type: Sequelize.QueryTypes.SELECT
+      }
+    );
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
