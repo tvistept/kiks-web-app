@@ -461,6 +461,7 @@ bot.on('message', async (msg) => {
         });
     }
     if (text === '/rules') {
+      try {
         await bot.sendMessage(chatId, rules_message,  {
             reply_markup: {
                 keyboard: [
@@ -472,6 +473,9 @@ bot.on('message', async (msg) => {
                 "is_persistent": true,
             }
         });
+      } catch (error) {
+        console.error(error);
+      }
     }
     if (text === '/about') {
         await bot.sendMessage(chatId, about_message, {
