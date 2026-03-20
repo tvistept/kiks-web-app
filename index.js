@@ -461,6 +461,7 @@ bot.on('message', async (msg) => {
         });
     }
     if (text === '/rules') {
+      console.log('выполняю команду rules')
       try {
         await bot.sendMessage(chatId, rules_message,  {
             reply_markup: {
