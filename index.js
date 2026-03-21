@@ -8,7 +8,7 @@ const SERVICE_SHEET_ID = google_worksheet_id;
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
 
-const bot = new TelegramBot(tg_test_token, { polling: true });
+const bot = new TelegramBot(tg_token_kiks2, { polling: true });
 const sequelize = require('./db');
 const { Op } = require('sequelize');
 const models = require('./models');
@@ -19,11 +19,6 @@ const today = new Date();
 today.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00:00.000
 const https = require('https');
 const fs = require('fs');
-// Добавьте после импортов
-// const sslOptions = {
-//     key: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/privkey.pem'),
-//     cert: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/fullchain.pem')
-// };
 const sslOptions = {
     key: fs.readFileSync('/etc/letsencrypt/live/kiks.space/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/kiks.space/fullchain.pem')
