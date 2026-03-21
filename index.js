@@ -20,16 +20,20 @@ today.setHours(0, 0, 0, 0); // Устанавливаем время на 00:00:
 const https = require('https');
 const fs = require('fs');
 // Добавьте после импортов
+// const sslOptions = {
+//     key: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/privkey.pem'),
+//     cert: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/fullchain.pem')
+// };
 const sslOptions = {
-    key: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/kiks-app.ru/fullchain.pem')
+    key: fs.readFileSync('/etc/letsencrypt/live/kiks.space/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/kiks.space/fullchain.pem')
 };
 
 const express = require('express');
 const cors = require('cors');
 const app = express();
 app.use(cors({
-  origin: ['https://kiks-app.ru', 'https://tvistept.github.io/kiks-test-react-app/', 'https://tvistept.github.io/kiks-admin-panel/', 'https://tvistept.github.io'],
+  origin: ['https://kiks-app.ru','https://kiks.space', 'https://tvistept.github.io/kiks-test-react-app/', 'https://tvistept.github.io/kiks-admin-panel/', 'https://tvistept.github.io'],
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
 }));
 const http = require('http');
@@ -49,7 +53,7 @@ https.createServer(sslOptions, app).listen(
     API_PORT, 
     '0.0.0.0',
     () => {
-        console.log(`HTTPS сервер запущен на https://kiks-app.ru:${API_PORT}`);
+        console.log(`HTTPS сервер запущен на https://kiks.space:${API_PORT}`);
     }
 );
 
