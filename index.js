@@ -831,10 +831,10 @@ bot.on('message', async (msg) => {
 });
 
 bot.on('callback_query', async (callbackQuery) => {
-  try {
-    let chat_id = callbackQuery.message.chat.id
-    let messageText = callbackQuery.data
+  let chat_id = callbackQuery.message.chat.id
+  let messageText = callbackQuery.data
 
+  try {
     if (messageText.includes('deleteBron')) {
       let tableNumDateTime = messageText.replace('deleteBron_','')
       let tableNum = tableNumDateTime.split('__')[0]
@@ -868,13 +868,25 @@ bot.on('callback_query', async (callbackQuery) => {
       editMessage(chat_id, callbackQuery.message.message_id, `Ты отменил бронь на ${bookDate} с ${bookTime}`)
     }
   } catch (error) {
-    let errorDedails = `chat_id: ${chat_id}, startDate: ${startDate}, endDate: ${endDate}, bookTime: ${bookTime}, tableNum: ${tableNum}, bookHours: ${bookHours}, clubId: ${clubId}`
-    console.error('Callback error:', `Ошибка удаления брони: ${errorDedails} (${error})`);
-
+    // Получаем chat_id из callbackQuery, если он доступен
+    const chatId = callbackQuery?.message?.chat?.id || 'unknown';
+    
+    // Создаем объект с деталями ошибки
+    const errorDetails = {
+      chat_id: chatId,
+      error_message: error.message,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.error('Callback error:', errorDetails);
+    
     try {
-        await appendRow(SERVICE_SHEET_ID, 'errors_log', [[chat_id, `Ошибка при удалении брони: ${errorDedails}`]]);
+      await appendRow(SERVICE_SHEET_ID, 'errors_log', [[
+        chatId, 
+        `Ошибка при удалении брони: ${JSON.stringify(errorDetails)}`
+      ]]);
     } catch (logErr) {
-        console.error('Ошибка при логировании:', logErr);
+      console.error('Ошибка при логировании:', logErr);
     }
 
     try {
