@@ -613,7 +613,18 @@ bot.on('message', async (msg) => {
                 tableName = `стол № ${data.table}`
             }
 
-            let kiksManager = clubId === 'kiks2' ? `<a href="https://t.me/KiksPetra">Киксу</a>` : '<a href="https://t.me/kiks_book">Киксу</a>'
+            let kiksManager = ''
+            let bookHoldingMessage = ', он держит бронь только 15 минут.'
+            if (clubId === 'kiks2') {
+              kiksManager = `<a href="https://t.me/KiksPetra">Киксу</a>`
+            } else if (clubId === 'kiks1') {
+              kiksManager = `<a href="https://t.me/kiks_book">Киксу</a>`
+            } else if (clubId === 'kiks3') {
+              kiksManager = `нашим менеджерам:\nКсения 89098082232 \nНикита 89959805415`
+              bookHoldingMessage = '\nОни держат бронь только 15 минут.'
+            }
+
+
             let kiksKitchen = clubId === 'kiks2' ? `` : '(до 23:00) '
 
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
@@ -624,7 +635,7 @@ bot.on('message', async (msg) => {
             }
 
             let infoMessage1 = `У нас есть кухня ${kiksKitchen}и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
-            let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
+            let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}${bookHoldingMessage}`
             let finalMessage = `${data.name}, это успех!${infoMessage}\n\n${infoMessageVip}\n${infoMessage1}\n\n${infoMessage2}`
 
 
