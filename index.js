@@ -4,6 +4,7 @@ const apiRouter = require('./api');
 const { tg_token, google_worksheet_id, google_sheet_id, google_worksheet_id_kiks2, tg_token_kiks2, tg_test_token } = require('/app-configs/tokens.js');
 const USER1_SHEET_ID = google_sheet_id;
 const USER2_SHEET_ID = google_worksheet_id_kiks2;
+const USER3_SHEET_ID = '1_JC03Ev-OvUXufVjCPyJbRMiMnc53CAsJS4Ko84njiU';
 const SERVICE_SHEET_ID = google_worksheet_id;
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
@@ -99,6 +100,20 @@ let getBookingTime = (time, offsetHours) => {
   const date = new Date();
   date.setHours(h + offsetHours, 0, 0);
   return String(date.getHours()).padStart(2, "0") + ":00:00";
+}
+
+let getSheetId = (clubId) => {
+  switch (clubId) {
+    case 'kiks1':
+      return USER1_SHEET_ID;
+      break;
+    case 'kiks2':
+      return USER2_SHEET_ID;
+      break;
+    case 'kiks3':
+      return USER3_SHEET_ID;
+      break;
+  }
 }
 
 function isWeekend(date) {
@@ -310,7 +325,7 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
       ? { '12:00': 'C', '13:00': 'D', '14:00': 'E', '15:00': 'F', '16:00': 'G', '17:00': 'H', '18:00': 'I', '19:00': 'J', '20:00': 'K', '21:00': 'L', '22:00': 'M', '23:00': 'N', '00:00': 'O', '01:00': 'P' }
       : { '14:00': 'C', '15:00': 'D', '16:00': 'E', '17:00': 'F', '18:00': 'G', '19:00': 'H', '20:00': 'I', '21:00': 'J', '22:00': 'K', '23:00': 'L', '00:00': 'M', '01:00': 'N' };
 
-    const sheet_id = club === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+    let sheet_id = getSheetId(club);
     const startColumn = timeToColumn[bookTime];
     const startRow = parseInt(tableNum) + 1;
 
@@ -362,7 +377,7 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '01:00': 'N'
       };
 
-      let spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+      let spreadsheetId = getSheetId(clubId);
       const startColumn = timeToColumn[bookTime];
       const startRow = parseInt(tableNum) + 1; // Строка = номер стола + 1
 
@@ -575,7 +590,20 @@ bot.on('message', async (msg) => {
             const dateString = data.date;
             const [year, month, day] = dateString.split('-');
             const formattedDate = `${day}.${month}.${year}`;
-            let clubId = data.club === 'Каменноостровский 26-28' ? 'kiks2' : 'kiks1';
+            let clubId;
+
+            switch (data.club) {
+              case 'Каменноостровский 26-28':
+                clubId = 'kiks2'
+                break;
+              case 'Марата 56-58':
+                clubId = 'kiks1'
+                break;
+              case 'Севкабель':
+                clubId = 'kiks3'
+                break;
+            }
+
             let tableName;
             if (data.table == 7 ) {
                 tableName = 'DARK ROOM'
@@ -598,6 +626,7 @@ bot.on('message', async (msg) => {
             let infoMessage1 = `У нас есть кухня ${kiksKitchen}и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
             let infoMessage2 = `P.S. Если ты опаздываешь, напиши ${kiksManager}, он держит бронь только 15 минут.`
             let finalMessage = `${data.name}, это успех!${infoMessage}\n\n${infoMessageVip}\n${infoMessage1}\n\n${infoMessage2}`
+
 
             //проверка на существование конфликта в базе данных
             try {
@@ -759,7 +788,8 @@ bot.on('message', async (msg) => {
                 }
 
                 // 4. Всё прошло успешно → отправляем сообщение
-                const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+                // const spreadsheetId = clubId === 'kiks2' ? USER2_SHEET_ID : USER1_SHEET_ID;
+                let spreadsheetId = getSheetId(clubId);
                 const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
 
                 const BUTTONS_BOOK_READY = {
