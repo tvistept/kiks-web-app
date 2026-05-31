@@ -10,6 +10,16 @@ const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
 
 const bot = new TelegramBot(tg_token_kiks2, { polling: true });
+
+bot.on('polling_error', (error) => {
+    console.error('[Polling error]', error.code, error.message);
+    // ошибка не фатальна – бот попробует переподключиться сам
+});
+
+bot.on('error', (error) => {
+    console.error('[Bot fatal error]', error);
+});
+
 const sequelize = require('./db');
 const { Op } = require('sequelize');
 const models = require('./models');
