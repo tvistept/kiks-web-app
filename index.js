@@ -1,45 +1,14 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { google } = require('googleapis');
 const apiRouter = require('./api');
-const { tg_token, google_worksheet_id, google_sheet_id, google_worksheet_id_kiks2, tg_token_kiks2, tg_test_token } = require('/app-configs/tokens.js');
+const { tg_token, google_worksheet_id, google_sheet_id, google_worksheet_id_kiks2, tg_token_kiks2, tg_test_token, webhook_token } = require('/app-configs/tokens.js');
 const USER1_SHEET_ID = google_sheet_id;
 const USER2_SHEET_ID = google_worksheet_id_kiks2;
 const USER3_SHEET_ID = '1_JC03Ev-OvUXufVjCPyJbRMiMnc53CAsJS4Ko84njiU';
 const SERVICE_SHEET_ID = google_worksheet_id;
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
-
-const bot = new TelegramBot(tg_token_kiks2, {
-    polling: {
-        interval: 300,      // интервал между запросами (мс)
-        autoStart: true,
-        params: {
-            timeout: 10     // таймаут ожидания обновлений (сек)
-        }
-    }
-});
-
-
-
-// После создания bot, перед любыми обработчиками
-bot.getUpdates({ offset: -1, timeout: 5 })
-  .then(() => console.log('Queue cleared'))
-  .catch(e => console.error('Clear error', e));
-
-bot.startPolling({
-  interval: 300,
-  params: { timeout: 10 }
-});
-
-bot.on('polling_error', (error) => {
-    console.error('[Polling error]', error.code, error.message);
-    // ошибка не фатальна – бот попробует переподключиться сам
-});
-
-bot.on('error', (error) => {
-    console.error('[Bot fatal error]', error);
-});
-
+const bot = new TelegramBot(tg_token_kiks2, { polling: false });
 const sequelize = require('./db');
 const { Op } = require('sequelize');
 const models = require('./models');
@@ -64,24 +33,34 @@ app.use(cors({
 }));
 const http = require('http');
 const e = require('express');
+
+app.use(express.json()); // уже есть, убедись что он до middleware webhook
+app.use(bot.webhookCallback('/webhook'));
+
+
+
 http.createServer((req, res) => {
   res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
   res.end();
 }).listen(80);
 
-app.use(express.json()); // для парсинга JSON
-app.use('/api', apiRouter); // все API-роуты будут начинаться с /api
+  app.use('/api', apiRouter);
+const API_PORT = 8443; 
 
-// Запускаем Express-сервер на другом порту (не 3000)
-const API_PORT = 5000; // Или любой свободный порт
+https.createServer(sslOptions, app).listen(API_PORT, '0.0.0.0', async () => {
+    console.log(`HTTPS сервер запущен на https://kiks.space:${API_PORT}`);
 
-https.createServer(sslOptions, app).listen(
-    API_PORT, 
-    '0.0.0.0',
-    () => {
-        console.log(`HTTPS сервер запущен на https://kiks.space:${API_PORT}`);
+    // Устанавливаем webhook
+    const webhookUrl = `https://kiks.space:${API_PORT}/webhook`;
+    try {
+        const result = await bot.setWebHook(webhookUrl, {
+            secret_token: webhook_token
+        });
+        console.log('Webhook установлен:', result ? 'успешно' : 'не удалось');
+    } catch (err) {
+        console.error('Ошибка установки webhook:', err);
     }
-);
+});
 
 async function testConnection() {
     try {
