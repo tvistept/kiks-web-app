@@ -19,6 +19,18 @@ const bot = new TelegramBot(tg_token_kiks2, {
     }
 });
 
+
+
+// После создания bot, перед любыми обработчиками
+bot.getUpdates({ offset: -1, timeout: 5 })
+  .then(() => console.log('Queue cleared'))
+  .catch(e => console.error('Clear error', e));
+
+bot.startPolling({
+  interval: 300,
+  params: { timeout: 10 }
+});
+
 bot.on('polling_error', (error) => {
     console.error('[Polling error]', error.code, error.message);
     // ошибка не фатальна – бот попробует переподключиться сам
