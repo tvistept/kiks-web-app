@@ -9,7 +9,15 @@ const SERVICE_SHEET_ID = google_worksheet_id;
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
 
-const bot = new TelegramBot(tg_token_kiks2, { polling: true });
+const bot = new TelegramBot(tg_token_kiks2, {
+    polling: {
+        interval: 300,      // интервал между запросами (мс)
+        autoStart: true,
+        params: {
+            timeout: 10     // таймаут ожидания обновлений (сек)
+        }
+    }
+});
 
 bot.on('polling_error', (error) => {
     console.error('[Polling error]', error.code, error.message);
