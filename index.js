@@ -152,7 +152,7 @@ let getSheetId = (clubId) => {
   }
 }
 
-function isWeekend(date) {
+function isWeekend(date, clubId) {
   const weekendDays = [
     '02.01.2026',
     '03.01.2026',
@@ -171,9 +171,16 @@ function isWeekend(date) {
   ];
 
   const day = date.getDay();
-    if (day === 0 || day === 6) {
-        return true;
+
+  if (clubId == 'kiks3') {
+    if (day === 0 || day === 6 || day === 5) {
+      return true;
     }
+  } else {
+    if (day === 0 || day === 6) {
+      return true;
+    }
+  }
 
   const dateString = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
   return weekendDays.includes(dateString);
@@ -359,7 +366,7 @@ async function unmergeCells(sheets, range, spreadsheetId) {
 
 async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) { 
   try {
-    const timeToColumn = isWeekend(dateFromString(bookDate))
+    const timeToColumn = isWeekend(dateFromString(bookDate), club)
       ? { '12:00': 'C', '13:00': 'D', '14:00': 'E', '15:00': 'F', '16:00': 'G', '17:00': 'H', '18:00': 'I', '19:00': 'J', '20:00': 'K', '21:00': 'L', '22:00': 'M', '23:00': 'N', '00:00': 'O', '01:00': 'P' }
       : { '14:00': 'C', '15:00': 'D', '16:00': 'E', '17:00': 'F', '18:00': 'G', '19:00': 'H', '20:00': 'I', '21:00': 'J', '22:00': 'K', '23:00': 'L', '00:00': 'M', '01:00': 'N' };
 
@@ -385,7 +392,7 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
     try {
       // Определяем колонку для времени
       let timeToColumn = {}
-      isWeekend(dateFromString(bookDate)) ? timeToColumn = {
+      isWeekend(dateFromString(bookDate), clubId) ? timeToColumn = {
           '12:00': 'C',
           '13:00': 'D',
           '14:00': 'E',
