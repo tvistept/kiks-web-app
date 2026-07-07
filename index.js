@@ -672,7 +672,7 @@ bot.on('message', async (msg) => {
             }
 
 
-            let kiksKitchen = clubId === 'kiks2' ? `` : '(до 23:00) '
+            let kiksKitchen = clubId === 'kiks1' ? `до 22:30 (пт, сб - до 00:30) ` : '(до 23:00) '
 
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
 
