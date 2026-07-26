@@ -650,9 +650,9 @@ bot.on('message', async (msg) => {
             }
 
             let tableName;
-            if (data.table == 7 ) {
+            if (data.table == 7 && clubId === 'kiks2') {
                 tableName = 'DARK ROOM'
-            } else if (data.table == 8) {
+            } else if (data.table == 8 && clubId === 'kiks2') {
                 tableName = 'WOOD ROOM'
             } else {
                 tableName = `стол № ${data.table}`
