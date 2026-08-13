@@ -20,5 +20,5 @@ Cтоимость игры:
 <a href="https://t.me/kiks_bi">tg-канал</a>
 <a href="https://www.instagram.com/kiks_bi/">ig</a>
 
-Если остался важный вопрос: @kiks_book (Марата) или @KiksPetra (Каменноостровский)`
+Если остался важный вопрос: @kiks_book (Марата), @KiksPetra (Каменноостровский) или @kiksEstcable (Севкабель)`
 };

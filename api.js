@@ -394,11 +394,13 @@ router.post('/create-closed-slot', async (req, res) => {
     if (table == -1) {
       let tables
       if (club_id == 'kiks1') {
-        tables = [3, 4, 5, 6];
+        tables = [3, 4, 5, 6, 7];
       } else if (club_id == 'kiks2') {
         tables = [3, 4, 6, 7, 8];
-      } else {
-        tables = [2,3,4];
+      } else if (club_id == 'kiks3') {
+        tables = [3,4,5,6];
+      } else if (club_id == 'kiks4') {
+        tables = [3,4,5];
       }
 
       const newSlots = tables.map(table => ({

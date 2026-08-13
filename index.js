@@ -5,6 +5,7 @@ const { tg_token, google_worksheet_id, google_sheet_id, google_worksheet_id_kiks
 const USER1_SHEET_ID = google_sheet_id;
 const USER2_SHEET_ID = google_worksheet_id_kiks2;
 const USER3_SHEET_ID = '1_JC03Ev-OvUXufVjCPyJbRMiMnc53CAsJS4Ko84njiU';
+const USER4_SHEET_ID = '1Hux_RVoxUE5OFTISRiNVwEiM-4MmMOow2eDfJR5A8yk';
 const SERVICE_SHEET_ID = google_worksheet_id;
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
@@ -149,6 +150,9 @@ let getSheetId = (clubId) => {
     case 'kiks3':
       return USER3_SHEET_ID;
       break;
+    case 'kiks4':
+      return USER4_SHEET_ID;
+      break
   }
 }
 
@@ -647,6 +651,9 @@ bot.on('message', async (msg) => {
               case 'Севкабель':
                 clubId = 'kiks3'
                 break;
+              case 'NeKiks':
+                clubId = 'kiks4'
+                break;
             }
 
             let tableName;
@@ -665,9 +672,11 @@ bot.on('message', async (msg) => {
               kiksManager = `<a href="https://t.me/KiksPetra">Киксу</a>`
             } else if (clubId === 'kiks1') {
               kiksManager = `<a href="https://t.me/kiks_book">Киксу</a>`
+            } else if (clubId === 'kiks4') {
+              kiksManager = `<a href="https://t.me/kiks_nekiks">Киксу</a>`
             } else if (clubId === 'kiks3') {
-              communicationMethod = 'позвони'
-              kiksManager = `в клуб: 8 (992) 168-88-77`
+              kiksManager = `напиши <a href="https://t.me/kiksEstcable">Киксу</a> или позвони в клуб: 8 (992) 168-88-77.`
+              communicationMethod = ''
               bookHoldingMessage = '\nМы держим бронь только 15 минут.'
             }
 
@@ -677,7 +686,7 @@ bot.on('message', async (msg) => {
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
 
             let infoMessageVip = ''
-            if (data.table == 7 || data.table == 8) {
+            if (clubId === 'kiks2' && (data.table == 7 || data.table == 8)) {
                 infoMessageVip = `Стоимость бронирования VIP комнаты 1000 день/2000 вечер.\n`
             }
 
