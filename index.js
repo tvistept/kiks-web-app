@@ -673,16 +673,14 @@ bot.on('message', async (msg) => {
             } else if (clubId === 'kiks1') {
               kiksManager = `<a href="https://t.me/kiks_book">Киксу</a>`
             } else if (clubId === 'kiks4') {
-              kiksManager = `<a href="https://t.me/kiks_nekiks">Киксу</a>`
+              kiksManager = `@ (comming soon)`
             } else if (clubId === 'kiks3') {
               kiksManager = `напиши <a href="https://t.me/kiksEstcable">Киксу</a> или позвони в клуб: 8 (992) 168-88-77.`
               communicationMethod = ''
               bookHoldingMessage = '\nМы держим бронь только 15 минут.'
             }
 
-
             let kiksKitchen = clubId === 'kiks1' ? `до 22:30 (пт, сб - до 00:30) ` : '(до 23:00) '
-
             let infoMessage = `\nОбщая информация:\n• ${data.club}\n• ${formattedDate}\n• ${data.time}\n• ${tableName}\n• ${data.hours} ${prefix}`
 
             let infoMessageVip = ''
@@ -690,7 +688,12 @@ bot.on('message', async (msg) => {
                 infoMessageVip = `Стоимость бронирования VIP комнаты 1000 день/2000 вечер.\n`
             }
 
-            let infoMessage1 = `У нас есть кухня ${kiksKitchen}и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
+            let infoMessage1 
+            if (clubId == 'kiks4') {
+              infoMessage1 =`У нас есть бар с коктейлями, крепким алкоголем и кальяном. Кухня работает с открытия до закрытия (18:00-06:00). Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар`
+            } else {
+              infoMessage1 = `У нас есть кухня ${kiksKitchen}и пивной крафтовый бар. Просим не приносить свою еду и напитки.\nОбращаем ваше внимание, что в счет для компаний от 6 человек включен сервисный сбор в размере 10% на кухню и бар.`
+            }
             let infoMessage2 = `P.S. Если ты опаздываешь, ${communicationMethod} ${kiksManager}${bookHoldingMessage}`
             let finalMessage = `${data.name}, это успех!${infoMessage}\n\n${infoMessageVip}\n${infoMessage1}\n\n${infoMessage2}`
 
