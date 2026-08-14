@@ -651,7 +651,7 @@ bot.on('message', async (msg) => {
               case 'Севкабель':
                 clubId = 'kiks3'
                 break;
-              case 'NeKiks':
+              case 'Не Кикс':
                 clubId = 'kiks4'
                 break;
             }
