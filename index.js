@@ -370,9 +370,13 @@ async function unmergeCells(sheets, range, spreadsheetId) {
 
 async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) { 
   try {
-    const timeToColumn = isWeekend(dateFromString(bookDate), club)
+    let timeToColumn = isWeekend(dateFromString(bookDate), club)
       ? { '12:00': 'C', '13:00': 'D', '14:00': 'E', '15:00': 'F', '16:00': 'G', '17:00': 'H', '18:00': 'I', '19:00': 'J', '20:00': 'K', '21:00': 'L', '22:00': 'M', '23:00': 'N', '00:00': 'O', '01:00': 'P' }
       : { '14:00': 'C', '15:00': 'D', '16:00': 'E', '17:00': 'F', '18:00': 'G', '19:00': 'H', '20:00': 'I', '21:00': 'J', '22:00': 'K', '23:00': 'L', '00:00': 'M', '01:00': 'N' };
+
+    if (club === 'kiks4') {
+      timeToColumn = { '18:00': 'C', '19:00': 'D', '20:00': 'E', '21:00': 'F', '22:00': 'G', '23:00': 'H', '00:00': 'I', '01:00': 'J', '02:00': 'K', '03:00': 'L', '04:00': 'M', '05:00': 'N'}
+    }
 
     let sheet_id = getSheetId(club);
     const startColumn = timeToColumn[bookTime];
@@ -425,6 +429,10 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
           '00:00': 'M',
           '01:00': 'N'
       };
+
+      if (clubId === 'kiks4') {
+        timeToColumn = { '18:00': 'C', '19:00': 'D', '20:00': 'E', '21:00': 'F', '22:00': 'G', '23:00': 'H', '00:00': 'I', '01:00': 'J', '02:00': 'K', '03:00': 'L', '04:00': 'M', '05:00': 'N'}
+      }
 
       let spreadsheetId = getSheetId(clubId);
       const startColumn = timeToColumn[bookTime];
