@@ -378,6 +378,15 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
       timeToColumn = { '18:00': 'C', '19:00': 'D', '20:00': 'E', '21:00': 'F', '22:00': 'G', '23:00': 'H', '00:00': 'I', '01:00': 'J', '02:00': 'K', '03:00': 'L', '04:00': 'M', '05:00': 'N'}
     }
 
+    let startDate = new Date('2026-08-24');
+    let checkDate = dateFromString(bookDate);
+    startDate.setHours(0, 0, 0, 0);
+    checkDate.setHours(0, 0, 0, 0);
+
+    if (club === 'kiks3' && checkDate >= startDate) {
+      timeToColumn = { '13:00': 'C', '14:00': 'D', '15:00': 'E', '16:00': 'F', '17:00': 'G', '18:00': 'H', '19:00': 'I', '20:00': 'J', '21:00': 'K', '22:00': 'L' }
+    }
+
     let sheet_id = getSheetId(club);
     const startColumn = timeToColumn[bookTime];
     const startRow = parseInt(tableNum) + 1;
@@ -432,6 +441,15 @@ async function deleteBooking(bookDate, bookTime, tableNum, hours, clubId) {
 
       if (clubId === 'kiks4') {
         timeToColumn = { '18:00': 'C', '19:00': 'D', '20:00': 'E', '21:00': 'F', '22:00': 'G', '23:00': 'H', '00:00': 'I', '01:00': 'J', '02:00': 'K', '03:00': 'L', '04:00': 'M', '05:00': 'N'}
+      }
+
+      let startDate = new Date('2026-08-24');
+      let checkDate = dateFromString(bookDate);
+      startDate.setHours(0, 0, 0, 0);
+      checkDate.setHours(0, 0, 0, 0);
+
+      if (clubId === 'kiks3' && checkDate >= startDate) {
+        timeToColumn = { '13:00': 'C', '14:00': 'D', '15:00': 'E', '16:00': 'F', '17:00': 'G', '18:00': 'H', '19:00': 'I', '20:00': 'J', '21:00': 'K', '22:00': 'L' }
       }
 
       let spreadsheetId = getSheetId(clubId);
