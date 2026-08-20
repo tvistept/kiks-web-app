@@ -386,7 +386,7 @@ async function bookTable(bookDate, bookTime, tableNum, hours, userName, club) {
     if (club === 'kiks3' && checkDate >= startDate) {
       isWeekend(dateFromString(bookDate), club) ? 
       timeToColumn = { '12:00': 'C', '13:00': 'D', '14:00': 'E', '15:00': 'F', '16:00': 'G', '17:00': 'H', '18:00': 'I', '19:00': 'J', '20:00': 'K', '21:00': 'L', '22:00': 'M', '23:00': 'N', '00:00': 'O', '01:00': 'P', } :
-      timeToColumn = { '14:00': 'C', '15:00': 'D', '16:00': 'E', '17:00': 'F', '18:00': 'G', '19:00': 'H', '20:00': 'I', '21:00': 'J', '22:00': 'K'}
+      timeToColumn = { '13:00': 'C', '14:00': 'D', '15:00': 'E', '16:00': 'F', '17:00': 'G', '18:00': 'H', '19:00': 'I', '20:00': 'J', '21:00': 'K', '22:00': 'L'}
     }
 
     let sheet_id = getSheetId(club);
