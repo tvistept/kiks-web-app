@@ -703,7 +703,9 @@ bot.on('message', async (msg) => {
             } else if (clubId === 'kiks1') {
               kiksManager = `<a href="https://t.me/kiks_book">Киксу</a>`
             } else if (clubId === 'kiks4') {
-              kiksManager = `@ (comming soon)`
+              kiksManager = `напиши <a href="https://t.me/NeKiks57">Киксу</a> или позвони в клуб: 8 (981) 809-41-90.`
+              communicationMethod = ''
+              bookHoldingMessage = '\nМы держим бронь только 15 минут.'
             } else if (clubId === 'kiks3') {
               kiksManager = `напиши <a href="https://t.me/kiksEstcable">Киксу</a> или позвони в клуб: 8 (992) 168-88-77.`
               communicationMethod = ''
