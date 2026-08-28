@@ -177,7 +177,7 @@ function isWeekend(date, clubId) {
   const day = date.getDay();
 
   if (clubId == 'kiks3') {
-    if (day === 0 || day === 6 ) {
+    if (day === 0 || day === 6 || day === 5 ) {
       return true;
     }
   } else {
