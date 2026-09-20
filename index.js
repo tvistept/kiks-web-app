@@ -999,6 +999,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
   try {
     if (messageText.includes('deleteBron')) {
+      console.log(messageText)
       let tableNumDateTime = messageText.replace('deleteBron_','')
       let tableNum = tableNumDateTime.split('__')[0]
       let bookDate = tableNumDateTime.split('__')[1]
