@@ -923,6 +923,8 @@ bot.on('message', async (msg) => {
                 let spreadsheetId = getSheetId(clubId);
                 const sheetLink = await getSheetLink(formattedDate, spreadsheetId);
 
+                console.log(`deleteBron_${data.table}__${formattedDate}__${data.time}__${data.hours}__${clubId}`)
+
                 const BUTTONS_BOOK_READY = {
                     inline_keyboard: [
                         [{ text: 'проверить бронь', url: sheetLink }],
@@ -994,6 +996,7 @@ bot.on('message', async (msg) => {
 });
 
 bot.on('callback_query', async (callbackQuery) => {
+  console.log('here')
   let chat_id = callbackQuery.message.chat.id
   let messageText = callbackQuery.data
 
