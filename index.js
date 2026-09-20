@@ -10,7 +10,7 @@ const SERVICE_SHEET_ID = google_worksheet_id;
 const WEB_APP_URL = 'https://tvistept.github.io/kiks-test-react-app/';
 const KEY_FILE = '/app-configs/google.json';
 
-const bot = new TelegramBot(tg_token_kiks2, { polling: false });
+const bot = new TelegramBot(tg_token_kiks2, { polling: true });
 
 const sequelize = require('./db');
 const { Op } = require('sequelize');
@@ -43,24 +43,24 @@ const http = require('http');
 app.use(express.json());
 
 // Ручная обработка webhook (работает со старыми версиями библиотеки)
-app.post('/webhook', (req, res) => {
-    try {
-        // Проверяем secret_token для безопасности
-        if (webhook_token && req.headers['x-telegram-bot-api-secret-token'] !== webhook_token) {
-            console.warn('Invalid secret token');
-            return res.status(403).send('Forbidden');
-        }
+// app.post('/webhook', (req, res) => {
+//     try {
+//         // Проверяем secret_token для безопасности
+//         if (webhook_token && req.headers['x-telegram-bot-api-secret-token'] !== webhook_token) {
+//             console.warn('Invalid secret token');
+//             return res.status(403).send('Forbidden');
+//         }
         
-        // Передаём обновление боту
-        bot.processUpdate(req.body);
+//         // Передаём обновление боту
+//         bot.processUpdate(req.body);
         
-        // Отвечаем Telegram, что всё ок
-        res.sendStatus(200);
-    } catch (error) {
-        console.error('Webhook error:', error);
-        res.sendStatus(500);
-    }
-});
+//         // Отвечаем Telegram, что всё ок
+//         res.sendStatus(200);
+//     } catch (error) {
+//         console.error('Webhook error:', error);
+//         res.sendStatus(500);
+//     }
+// });
 
 http.createServer((req, res) => {
     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
@@ -75,19 +75,19 @@ https.createServer(sslOptions, app).listen(API_PORT, '0.0.0.0', async () => {
     console.log(`HTTPS сервер запущен на https://kiks.space:${API_PORT}`);
 
     // Устанавливаем webhook
-    const webhookUrl = `https://kiks.space:${API_PORT}/webhook`;
-    try {
-        const result = await bot.setWebHook(webhookUrl, {
-            secret_token: webhook_token
-        });
-        console.log('Webhook установлен:', result ? 'успешно' : 'не удалось');
+    // const webhookUrl = `https://kiks.space:${API_PORT}/webhook`;
+    // try {
+    //     const result = await bot.setWebHook(webhookUrl, {
+    //         secret_token: webhook_token
+    //     });
+    //     console.log('Webhook установлен:', result ? 'успешно' : 'не удалось');
         
-        // Проверяем статус webhook
-        const webhookInfo = await bot.getWebHookInfo();
-        console.log('Информация о webhook:', webhookInfo);
-    } catch (err) {
-        console.error('Ошибка установки webhook:', err);
-    }
+    //     // Проверяем статус webhook
+    //     const webhookInfo = await bot.getWebHookInfo();
+    //     console.log('Информация о webhook:', webhookInfo);
+    // } catch (err) {
+    //     console.error('Ошибка установки webhook:', err);
+    // }
 });
 
 async function testConnection() {
