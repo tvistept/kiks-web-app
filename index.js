@@ -544,7 +544,19 @@ async function deleteUserBookingRow(bookingId) {
   }
 }
 
+bot.startPolling();
+
+// Debug: логируем все входящие обновления
+bot.on('polling_error', (error) => {
+    console.error('POLLING ERROR:', error.message, error.code);
+});
+
+bot.on('webhook_error', (error) => {
+    console.error('WEBHOOK ERROR:', error.message);
+});
+
 bot.on('message', async (msg) => {
+    console.log('>>> MESSAGE:', msg.text || '(no text)');
     const chatId = msg.chat.id;
     const text = msg.text;
 
