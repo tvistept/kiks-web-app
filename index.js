@@ -78,7 +78,8 @@ https.createServer(sslOptions, app).listen(API_PORT, '0.0.0.0', async () => {
     const webhookUrl = `https://kiks.space:${API_PORT}/webhook`;
     try {
         const result = await bot.setWebHook(webhookUrl, {
-            secret_token: webhook_token
+            secret_token: webhook_token,
+            allowed_updates: ['message', 'callback_query']
         });
         console.log('Webhook установлен:', result ? 'успешно' : 'не удалось');
         
